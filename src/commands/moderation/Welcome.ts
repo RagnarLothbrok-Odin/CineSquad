@@ -8,7 +8,7 @@ import { KeyvInstance } from '../../utils/Util.js';
 @Category('Staff')
 export class Welcome {
     /**
-     * Allows configuration of the welcome modue
+     * Allows configuration of the welcome module
      * @param channel - The channel alerts will be sent to
      * @param interaction - The command interaction.
      */
