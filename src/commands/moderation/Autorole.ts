@@ -53,7 +53,7 @@ export class Autorole {
 
         // Send a confirmation message about the updated autorole
         await interaction.reply({
-            content: `Ne members will now automatically be given ${role}.`,
+            content: `New members will now automatically be given ${role}.`,
         });
     }
 }
