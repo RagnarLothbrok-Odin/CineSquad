@@ -28,8 +28,7 @@ export class GuildMemberAdd {
             const channel = member.guild?.channels.cache.get(data.welcome) as GuildTextBasedChannel;
 
             // Check if the channel exists and the bot has SendMessages permission
-            if (channel && channel.permissionsFor(channel.guild.members.me!)
-                .has(PermissionsBitField.Flags.SendMessages)) {
+            if (channel && channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
                 const welcome = await new canvafy.WelcomeLeave()
                     .setAvatar(member.user.displayAvatarURL({
                         forceStatic: true,
@@ -52,6 +51,21 @@ export class GuildMemberAdd {
             } else {
                 // If the channel doesn't exist or bot lacks SendMessages permission, remove 'welcome' property
                 delete data.welcome;
+            }
+        }
+
+        if (data && data.autorole) {
+            // Retrieve the role using the stored ID
+            const role = member.guild.roles.cache.get(data.autorole);
+
+            // Check if the role exists and the bot has ManageRoles permission
+            if (role && member.guild.members.me?.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
+                // Attempt to assign the role to the member
+                try {
+                    await member.roles.add(role.id);
+                } catch (e) {
+                    console.error(e);
+                }
             }
         }
     }
