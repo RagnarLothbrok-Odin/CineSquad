@@ -31,3 +31,10 @@ build/
 yarn-error.log
 .pnp.cjs
 .pnp.loader.mjs
+
+# ========================
+# Database
+# ========================
+
+# db
+src/db/db.sqlite
