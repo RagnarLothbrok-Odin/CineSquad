@@ -1,6 +1,12 @@
 import type { Message } from 'discord.js';
 import { Client } from 'discordx';
 import 'colors';
+import Keyv from 'keyv';
+
+// Initialize Keyv with SQLite storage.
+const keyv = new Keyv('sqlite://src/db/db.sqlite', { table: 'cinesquad', namespace: 'cinesquad' });
+// Handle connection errors for Keyv.
+keyv.on('error', (err) => console.log('[keyv] Connection Error', err));
 
 /**
  * Capitalises the first letter of each word in a string.
@@ -57,4 +63,12 @@ export async function getCommandIds(client: Client): Promise<{ [name: string]: s
         console.error('Error fetching global commands:', error);
         return {};
     }
+}
+
+/**
+ * Returns the initialized Keyv instance for handling welcome messages.
+ * @returns Keyv The initialized Keyv instance.
+ */
+export function KeyvInstance(): Keyv {
+    return keyv;
 }
