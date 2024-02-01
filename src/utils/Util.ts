@@ -90,3 +90,19 @@ export async function setDb(guildId: string, data: Record<string, string>): Prom
     // Set the updated data back to Keyv
     await keyv.set(guildId, existingData);
 }
+
+/**
+ * Delete a property for a guild in Keyv.
+ * @param guildId The ID of the guild.
+ * @param property The name of the property to be deleted.
+ */
+export async function deleteGuildProperty(guildId: string, property: string): Promise<void> {
+    // Retrieve existing data from Keyv
+    const existingData = (await keyv.get(guildId)) || {};
+
+    // Delete the specified property
+    delete existingData[property];
+
+    // Set the updated data back to Keyv
+    await keyv.set(guildId, existingData);
+}

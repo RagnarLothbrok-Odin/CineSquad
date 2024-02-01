@@ -3,7 +3,7 @@ import { Discord, Once } from 'discordx';
 import { GuildTextBasedChannel, PermissionsBitField } from 'discord.js';
 import canvafy from 'canvafy';
 import ordinal from 'ordinal';
-import { KeyvInstance } from '../utils/Util.js';
+import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
 
 /**
  * Discord.js GuildMemberAdd event handler.
@@ -50,7 +50,7 @@ export class GuildMemberAdd {
                 });
             } else {
                 // If the channel doesn't exist or bot lacks SendMessages permission, remove 'welcome' property
-                delete data.welcome;
+                await deleteGuildProperty(member.guild.id, 'welcome');
             }
         }
 
@@ -66,6 +66,9 @@ export class GuildMemberAdd {
                 } catch (e) {
                     console.error(e);
                 }
+            } else {
+                // If the role doesn't exist or bot lacks ManageRoles permission, remove 'autorole' property
+                await deleteGuildProperty(member.guild.id, 'autorole');
             }
         }
     }
