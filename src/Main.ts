@@ -9,7 +9,8 @@ import 'dotenv/config';
  * The Discord.js client instance.
  */
 const client = new Client({
-    intents: [IntentsBitField.Flags.Guilds, IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
+    intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds,
+        IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
     silent: true,
 });
 
