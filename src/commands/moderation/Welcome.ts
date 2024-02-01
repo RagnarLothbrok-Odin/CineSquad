@@ -1,6 +1,7 @@
 import { Discord, Slash, SlashOption } from 'discordx';
-import type { CommandInteraction, TextChannel } from 'discord.js';
-import { ApplicationCommandOptionType, PermissionsBitField } from 'discord.js';
+import {
+    ApplicationCommandOptionType, ChannelType, CommandInteraction, PermissionsBitField, TextChannel,
+} from 'discord.js';
 import { Category } from '@discordx/utilities';
 import { KeyvInstance } from '../../utils/Util.js';
 
@@ -32,6 +33,13 @@ export class Welcome {
         if (!channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
             return interaction.reply({
                 content: `I am missing the \`SendMessages\` permission in ${channel}.\nPlease grant me this permission and try running the command again.`,
+            });
+        }
+
+        // If the channel is not a GuildText channel, return an error
+        if (channel.type !== ChannelType.GuildText) {
+            return interaction.reply({
+                content: 'The specified channel was not a text channel.',
             });
         }
 
