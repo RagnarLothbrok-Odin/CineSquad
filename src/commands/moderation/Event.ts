@@ -3,7 +3,7 @@ import {
     ApplicationCommandOptionType, ChannelType, CommandInteraction, PermissionsBitField, TextChannel,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
-import { KeyvInstance } from '../../utils/Util.js';
+import { setDb } from '../../utils/Util.js';
 
 @Discord()
 @Category('Staff')
@@ -42,9 +42,7 @@ export class Event {
         }
 
         // Set the hosting channel for the guild in the Keyv database
-        await KeyvInstance().set(interaction.guild!.id, {
-            hosting: channel.id,
-        });
+        await setDb(interaction.guild!.id, { hosting: channel.id });
 
         // Send a confirmation message about the updated hosting channel
         await interaction.reply({

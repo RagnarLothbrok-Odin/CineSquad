@@ -3,7 +3,7 @@ import {
     ApplicationCommandOptionType, CommandInteraction, GuildMemberRoleManager, PermissionsBitField, Role,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
-import { KeyvInstance } from '../../utils/Util.js';
+import { setDb } from '../../utils/Util.js';
 
 @Discord()
 @Category('Staff')
@@ -49,9 +49,7 @@ export class Autorole {
         }
 
         // Save the role members will be given upon joining
-        await KeyvInstance().set(interaction.guild!.id, {
-            autorole: role.id,
-        });
+        await setDb(interaction.guild!.id, { autorole: role.id });
 
         // Send a confirmation message about the updated autorole
         await interaction.reply({

@@ -72,3 +72,21 @@ export async function getCommandIds(client: Client): Promise<{ [name: string]: s
 export function KeyvInstance(): Keyv {
     return keyv;
 }
+
+/**
+ * Set properties for a guild in Keyv.
+ * @param guildId The ID of the guild.
+ * @param data An object containing properties to be set.
+ */
+export async function setDb(guildId: string, data: Record<string, string>): Promise<void> {
+    // Retrieve existing data from Keyv
+    const existingData = (await keyv.get(guildId)) || {};
+
+    // Update properties dynamically using Object.keys
+    Object.keys(data).forEach((key) => {
+        existingData[key] = data[key];
+    });
+
+    // Set the updated data back to Keyv
+    await keyv.set(guildId, existingData);
+}
