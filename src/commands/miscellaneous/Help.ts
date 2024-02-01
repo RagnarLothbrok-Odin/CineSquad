@@ -17,8 +17,6 @@ export class Help {
      */
     @Slash({ description: 'Display list of commands.' })
     async help(interaction: CommandInteraction, client: Client) {
-        if (!interaction.channel) return;
-
         // Create the initial embed for the message
         const embed = new EmbedBuilder()
             .setColor('#e91e63')

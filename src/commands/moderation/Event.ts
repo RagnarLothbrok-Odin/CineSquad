@@ -27,8 +27,6 @@ export class Event {
             channel: TextChannel,
             interaction: CommandInteraction,
     ) {
-        if (!interaction.channel) return;
-
         // Check if the bot has the SendMessages permission in the specified channel
         if (!channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
             return interaction.reply({
