@@ -1,13 +1,13 @@
 {
   "name": "bot-template",
-  "version": "1.0.46",
-  "description": "This project provides a template for creating a Discord bot using discordx and discord.js v14.",
+  "version": "1.0.0",
+  "description": "CineSquad is the Discord bot created for our Discord server.",
   "license": "GPL-3.0-or-later",
   "author": "Ragnar Lothbrok <ragnarlothbrokjr@proton.me>",
-  "homepage": "https://github.com/Valhalla-Development/Bot-Template#readme",
-  "repository": "https://github.com/Valhalla-Development/Bot-Template.git",
+  "homepage": "https://github.com/Valhalla-Development/CineSquad#readme",
+  "repository": "https://github.com/Valhalla-Development/CineSquad.git",
   "bugs": {
-    "url": "https://github.com/Valhalla-Development/Bot-Template/issues"
+    "url": "https://github.com/Valhalla-Development/CineSquad/issues"
   },
   "type": "module",
   "main": "build/Main.js",
