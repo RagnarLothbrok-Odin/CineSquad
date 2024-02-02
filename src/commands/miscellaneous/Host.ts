@@ -2,10 +2,18 @@ import {
     Client, Discord, ModalComponent, Slash,
 } from 'discordx';
 import {
-    ActionRowBuilder, CommandInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle,
+    ActionRowBuilder,
+    CommandInteraction,
+    ModalBuilder,
+    ModalSubmitInteraction,
+    PermissionsBitField,
+    TextInputBuilder,
+    TextInputStyle,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
-import { isValidIMDbURL, isValidTimeZone } from '../../utils/Util.js';
+import {
+    deleteGuildProperty, isValidIMDbURL, isValidTimeZone, KeyvInstance,
+} from '../../utils/Util.js';
 
 @Discord()
 @Category('Miscellaneous')
@@ -16,7 +24,31 @@ export class Host {
      * @param client - The Discord client.
      */
     @Slash({ description: 'Host content on Bigscreen' })
-    async host(interaction: CommandInteraction, client: Client): Promise<void> {
+    async host(interaction: CommandInteraction, client: Client) {
+        // Check if the hosting feature is enabled
+        // Retrieve data for the current guild from Keyv
+        const data = await KeyvInstance()
+            .get(interaction.guild!.id);
+
+        // Check if 'welcome' property exists in the data
+        if (data && data.hosting) {
+            // Retrieve the channel using the stored ID
+            const channel = interaction.guild?.channels.cache.get(data.welcome);
+
+            // Check if the channel exists and the bot has SendMessages permission
+            if (!channel || channel.permissionsFor(channel.guild.members.me!).has([
+                PermissionsBitField.Flags.CreatePublicThreads,
+                PermissionsBitField.Flags.ManageThreads,
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.SendMessagesInThreads,
+            ])) {
+                // If the channel doesn't exist or bot lacks permissions, remove 'hosting' property
+                await deleteGuildProperty(interaction.guild!.id, 'hosting');
+
+                return interaction.reply('Hosting is currently disabled on this server. Please reach out to a staff member for assistance in configuring it.');
+            }
+        }
+
         // Creating a modal for hosting content
         const contentHostModal = new ModalBuilder()
             .setTitle('Host Content')
