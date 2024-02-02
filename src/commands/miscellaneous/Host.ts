@@ -3,7 +3,10 @@ import {
 } from 'discordx';
 import {
     ActionRowBuilder,
+    codeBlock,
     CommandInteraction,
+    EmbedBuilder,
+    ForumChannel,
     ModalBuilder,
     ModalSubmitInteraction,
     PermissionsBitField,
@@ -12,7 +15,7 @@ import {
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
 import {
-    deleteGuildProperty, isValidIMDbURL, isValidTimeZone, KeyvInstance,
+    deleteGuildProperty, getContentDetails, isValidIMDbURL, isValidTimeZone, KeyvInstance,
 } from '../../utils/Util.js';
 
 @Discord()
@@ -30,10 +33,10 @@ export class Host {
         const data = await KeyvInstance()
             .get(interaction.guild!.id);
 
-        // Check if 'welcome' property exists in the data
+        // Check if 'hosting' property exists in the data
         if (data && data.hosting) {
             // Retrieve the channel using the stored ID
-            const channel = interaction.guild?.channels.cache.get(data.welcome);
+            const channel = interaction.guild?.channels.cache.get(data.hosting);
 
             // Check if the channel exists and the bot has SendMessages permission
             if (!channel || channel.permissionsFor(channel.guild.members.me!).has([
@@ -99,6 +102,12 @@ export class Host {
      */
     @ModalComponent({ id: 'hostContent' })
     async modalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+        const data = await KeyvInstance()
+            .get(interaction.guild!.id);
+
+        // Retrieve the channel using the stored ID
+        const channel = interaction.guild?.channels.cache.get(data.hosting) as ForumChannel;
+
         // Retrieving values from text input fields
         const [imdbField, timezone, roomId] = ['imdbField', 'timezone', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
@@ -120,6 +129,36 @@ export class Host {
             const errorMessage = `The provided ${invalidInputs.join(' and ')} ${invalidInputs.length > 1 ? 'are' : 'is'} invalid.\nPlease double-check and try again.`;
 
             await interaction.reply(errorMessage);
+        }
+
+        // Data is valid, fetch details
+        const details = await getContentDetails(imdbField);
+
+        const embed = new EmbedBuilder()
+            .setColor('#e0b10e')
+            .setAuthor({
+                name: `${details!.title} (${details!.year})`,
+                url: imdbField,
+                iconURL: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/171_Imdb_logo_logos-1024.png',
+            })
+            .addFields(
+                { name: 'Votes', value: `**<:imdb:1202979511755612173> ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
+                { name: 'Genres', value: details!.genres, inline: true },
+                { name: 'Stars', value: details!.cast },
+            )
+            .setDescription(
+                `${codeBlock('text', `${details!.plot}`)}${roomId ? `\n\n**Invite Code: ${roomId}` : ''}`,
+            )
+            .setImage(details!.image);
+
+        if (channel) {
+            // Attempt to create the thread
+            await channel.threads.create({
+                name: `${details!.title} (${details!.year})`,
+                autoArchiveDuration: 1440,
+                reason: 'Needed a separate thread for food',
+                message: { embeds: [embed] },
+            });
         }
     }
 }
