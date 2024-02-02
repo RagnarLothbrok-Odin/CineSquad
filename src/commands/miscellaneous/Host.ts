@@ -26,12 +26,20 @@ export class Host {
         const imdbField = new TextInputBuilder()
             .setCustomId('imdbField')
             .setLabel('IMDb link to the content you wish to host.')
-            .setStyle(TextInputStyle.Short);
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
 
         const timezoneField = new TextInputBuilder()
             .setCustomId('timezone')
             .setLabel('Enter your timezone *e.g. GMT*')
-            .setStyle(TextInputStyle.Short);
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
+        const roomField = new TextInputBuilder()
+            .setCustomId('roomId')
+            .setLabel('Enter the room invite ID')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(false);
 
         // Creating action rows with the respective input fields
         const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -42,8 +50,12 @@ export class Host {
             timezoneField,
         );
 
+        const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+            roomField,
+        );
+
         // Adding the action rows to the modal
-        contentHostModal.addComponents(row1, row2);
+        contentHostModal.addComponents(row1, row2, row3);
 
         // Displaying the modal in response to the interaction
         await interaction.showModal(contentHostModal);
@@ -56,7 +68,7 @@ export class Host {
     @ModalComponent({ id: 'hostContent' })
     async modalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
         // Retrieving values from text input fields
-        const [imdbField, timezone] = ['imdbField', 'timezone'].map((id) => interaction.fields.getTextInputValue(id));
+        const [imdbField, timezone, roomId] = ['imdbField', 'timezone', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
         // Validate IMDb URL and timezone
         const isIMDbURLValid = isValidIMDbURL(imdbField);
