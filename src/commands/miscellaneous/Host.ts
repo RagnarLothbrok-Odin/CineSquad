@@ -5,6 +5,7 @@ import {
     ActionRowBuilder, CommandInteraction, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
+import { isValidIMDbURL, isValidTimeZone } from '../../utils/Util.js';
 
 @Discord()
 @Category('Miscellaneous')
@@ -57,10 +58,24 @@ export class Host {
         // Retrieving values from text input fields
         const [imdbField, timezone] = ['imdbField', 'timezone'].map((id) => interaction.fields.getTextInputValue(id));
 
-        // Ensure imdbField is a valid URL
-        const imdbRegexPattern = /^(https?:\/\/)?(www\.|m\.)?imdb\.com\/title\/tt\d+\/?$/i;
-        if (!imdbRegexPattern.test(imdbField)) {
-            return interaction.reply('The IMDb link you provided is invalid. Please double-check and try again.');
+        // Validate IMDb URL and timezone
+        const isIMDbURLValid = isValidIMDbURL(imdbField);
+        const isTimeZoneValid = isValidTimeZone(timezone);
+
+        if (!isIMDbURLValid || !isTimeZoneValid) {
+            const invalidInputs = [];
+
+            if (!isIMDbURLValid) {
+                invalidInputs.push('IMDb link');
+            }
+
+            if (!isTimeZoneValid) {
+                invalidInputs.push('timezone');
+            }
+
+            const errorMessage = `The provided ${invalidInputs.join(' and ')} ${invalidInputs.length > 1 ? 'are' : 'is'} invalid.\nPlease double-check and try again.`;
+
+            await interaction.reply(errorMessage);
         }
     }
 }
