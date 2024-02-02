@@ -136,16 +136,6 @@ export function isValidTime(time: string, timezone: string): string | null {
 }
 
 /**
- * Validates if the provided string is a valid IMDb URL.
- * @param imdbField The IMDb URL to validate.
- * @returns true if the IMDb URL is valid, otherwise false.
- */
-export function isValidIMDbURL(imdbField: string): boolean {
-    const imdbRegexPattern = /^(https?:\/\/)?(www\.|m\.)?imdb\.com\/title\/tt\d+\/?$/i;
-    return imdbRegexPattern.test(imdbField);
-}
-
-/**
  * Fetches and returns details of content based on the provided URL.
  * @param url - The URL of the content.
  * @returns A promise that resolves to content details or undefined if the data is not available.
