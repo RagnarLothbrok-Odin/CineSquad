@@ -235,5 +235,20 @@ export class Host {
         if (interaction.user.id !== button[3]) {
             await interaction.reply({ content: 'This button is reserved for the thread host.', ephemeral: true });
         }
+
+        // If the button clicked was StartTime
+        if (button[2] === 'StartTime') {
+            // TODO
+        }
+
+        // If the button clicked was StartTime
+        if (button[2] === 'ChangeTimezone') {
+            // TODO
+        }
+
+        // If the button clicked was StartTime
+        if (button[2] === 'LockThread') {
+            // TODO
+        }
     }
 }
