@@ -28,7 +28,12 @@ export class Event {
             interaction: CommandInteraction,
     ) {
         // Check if the bot has the SendMessages permission in the specified channel
-        if (!channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
+        if (!channel.permissionsFor(channel.guild.members.me!).has([
+            PermissionsBitField.Flags.CreatePublicThreads,
+            PermissionsBitField.Flags.ManageThreads,
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.SendMessagesInThreads,
+        ])) {
             return interaction.reply({
                 content: `I am missing the \`SendMessages\` permission in ${channel}.\nPlease grant me this permission and try running the command again.`,
             });
