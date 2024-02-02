@@ -31,7 +31,6 @@ export class Event {
         if (!channel.permissionsFor(channel.guild.members.me!).has([
             PermissionsBitField.Flags.CreatePublicThreads,
             PermissionsBitField.Flags.ManageThreads,
-            PermissionsBitField.Flags.SendMessages,
             PermissionsBitField.Flags.SendMessagesInThreads,
         ])) {
             return interaction.reply({
