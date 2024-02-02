@@ -1,6 +1,8 @@
 import { Discord, ModalComponent, Slash } from 'discordx';
 import {
     ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     codeBlock,
     CommandInteraction,
     EmbedBuilder,
@@ -13,7 +15,7 @@ import {
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
 import {
-    deleteGuildProperty, getContentDetails, isValidIMDbURL, isValidTime, isValidTimeZone, KeyvInstance,
+    deleteGuildProperty, getContentDetails, isValidTime, isValidTimeZone, KeyvInstance,
 } from '../../utils/Util.js';
 
 @Discord()
@@ -121,7 +123,9 @@ export class Host {
         const [imdbField, timezone, startTime, roomId] = ['imdbField', 'timezone', 'startTime', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
         // Validate IMDb URL and timezone
-        const isIMDbURLValid = isValidIMDbURL(imdbField);
+        const imdbRegexPattern = /https?:\/\/(www\.|m\.)?imdb\.com\/title\/tt(\d+)(\/)?/;
+
+        const isIMDbURLValid = imdbField.match(imdbRegexPattern);
         const isTimeZoneValid = isValidTimeZone(timezone);
         const isTimeValid = isValidTime(startTime, timezone);
 
@@ -151,6 +155,7 @@ export class Host {
         // Data is valid, fetch details
         const details = await getContentDetails(imdbField);
 
+        // Embed to be sent to the created thread
         const embed = new EmbedBuilder()
             .setColor('#e0b10e')
             .setAuthor({
@@ -168,16 +173,51 @@ export class Host {
             )
             .setImage(details!.image);
 
+        // Buttons to be applied to the embed
+        const row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+                .setLabel('Open Content')
+                .setStyle(ButtonStyle.Link)
+                .setURL(imdbField),
+            new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setLabel('View Reviews')
+                .setURL(`https://imdb.com/title/tt${isIMDbURLValid[2]}/ratings`),
+            new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setLabel('View Cast')
+                .setURL(`https://imdb.com/title/tt${isIMDbURLValid[2]}/fullcredits`),
+            new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setLabel('Trivia')
+                .setURL(`https://imdb.com/title/tt${isIMDbURLValid[2]}/trivia`),
+        );
+
+        const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+            new ButtonBuilder()
+                .setCustomId('buttonStartTime')
+                .setLabel('Change Start Time')
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId('buttonChangeTimezone')
+                .setLabel('Change Time Zone')
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId('buttonLockThread')
+                .setLabel('Lock Thread')
+                .setStyle(ButtonStyle.Danger),
+        );
+
         if (channel) {
             // Attempt to create the thread
             const thread = await channel.threads.create({
                 name: `${details!.title} (${details!.year})${roomId ? ` - Invite Code: ${roomId}` : ''}`,
                 autoArchiveDuration: 1440,
                 reason: 'Needed a separate thread for food',
-                message: { embeds: [embed] },
+                message: { embeds: [embed], components: [row1, row2] },
             });
 
-            await interaction.editReply(`${interaction.member} is hosting in ${thread}, at ${startEpoch}`);
+            await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
         }
     }
 }
