@@ -2,7 +2,7 @@ import type { Message } from 'discord.js';
 import { Client } from 'discordx';
 import 'colors';
 import Keyv from 'keyv';
-import { IANAZone } from 'luxon';
+import { DateTime, IANAZone } from 'luxon';
 import { getTitleDetailsByUrl } from 'movier';
 
 // Initialize Keyv with SQLite storage.
@@ -119,6 +119,20 @@ export async function deleteGuildProperty(guildId: string, property: string): Pr
  */
 export function isValidTimeZone(timezone: string): boolean {
     return IANAZone.isValidZone(timezone);
+}
+
+/**
+ * Checks if the provided time is valid in the specified timezone.
+ * @param time - The time to validate (e.g., "7:30PM" or "19:30PM").
+ * @param timezone - The timezone to use for validation.
+ * @returns  true if the time is valid in the specified timezone, otherwise false.
+ */
+export function isValidTime(time: string, timezone: string): string | null {
+    // Attempt to create a DateTime object with the provided time and timezone
+    const dateTime = DateTime.fromFormat(time, 'h:mma', { zone: timezone });
+
+    // Check if the DateTime object is valid
+    return dateTime.isValid ? `<t:${Math.floor(dateTime.toMillis() / 1000)}>` : null;
 }
 
 /**
