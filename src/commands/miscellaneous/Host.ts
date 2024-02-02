@@ -1,7 +1,10 @@
-import { Discord, ModalComponent, Slash } from 'discordx';
+import {
+    ButtonComponent, Discord, ModalComponent, Slash,
+} from 'discordx';
 import {
     ActionRowBuilder,
     ButtonBuilder,
+    ButtonInteraction,
     ButtonStyle,
     codeBlock,
     CommandInteraction,
@@ -54,7 +57,7 @@ export class Host {
         // Creating a modal for hosting content
         const contentHostModal = new ModalBuilder()
             .setTitle('Host Content')
-            .setCustomId('hostContent');
+            .setCustomId(`hostContent_${interaction.user.id}`);
 
         // Creating text input fields for an IMDb link and timezone
         const imdbField = new TextInputBuilder()
@@ -109,8 +112,11 @@ export class Host {
      * Handles modal submit event
      * @param interaction - The ModalSubmitInteraction object that represents the user's interaction with the modal.
      */
-    @ModalComponent({ id: 'hostContent' })
+    @ModalComponent({ id: /^hostContent_/ })
     async modalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+        // Extract user ID from the customId
+        const userId = interaction.customId.split('_')[1];
+
         await interaction.deferReply();
 
         const data = await KeyvInstance()
@@ -195,15 +201,15 @@ export class Host {
 
         const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-                .setCustomId('buttonStartTime')
+                .setCustomId(`button_StartTime_${userId}`)
                 .setLabel('Change Start Time')
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
-                .setCustomId('buttonChangeTimezone')
+                .setCustomId(`button_ChangeTimezone_${userId}`)
                 .setLabel('Change Time Zone')
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
-                .setCustomId('buttonLockThread')
+                .setCustomId(`button_LockThread_${userId}`)
                 .setLabel('Lock Thread')
                 .setStyle(ButtonStyle.Danger),
         );
@@ -218,6 +224,16 @@ export class Host {
             });
 
             await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
+        }
+    }
+
+    @ButtonComponent({ id: /^button_(StartTime|ChangeTimezone|LockThread)_(\d+)$/ })
+    async buttonInteraction(interaction: ButtonInteraction) {
+        const button = interaction.customId.split('_');
+
+        // Return an error if the button clicker was not the original thread owner
+        if (interaction.user.id !== button[3]) {
+            await interaction.reply({ content: 'This button is reserved for the thread host.', ephemeral: true });
         }
     }
 }
