@@ -33,7 +33,7 @@ export class InteractionCreate {
 
                 logEmbed.addFields({
                     name: `Guild: ${interaction.guild.name} | Date: <t:${nowInSecond}>`,
-                    value: codeBlock('kotlin', `${interaction.user.username} executed the '${executedCommand}' command`),
+                    value: codeBlock('kotlin', `${interaction.user.displayName} executed the '${executedCommand}' command`),
                 });
 
                 const LoggingNoArgs = `[\x1b[31m${moment().format('LLLL')}\x1b[0m] '\x1b[92m${executedCommand}\x1b[0m' Command was executed by \x1b[31m${interaction.user.username}\x1b[0m (Guild: \x1b[31m${interaction.guild.name}\x1b[0m)`;
