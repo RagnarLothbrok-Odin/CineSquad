@@ -1,6 +1,6 @@
 import { Discord, Slash, SlashOption } from 'discordx';
 import {
-    ApplicationCommandOptionType, ChannelType, CommandInteraction, PermissionsBitField, TextChannel,
+    ApplicationCommandOptionType, ChannelType, CommandInteraction, ForumChannel, PermissionsBitField,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
 import { setDb } from '../../utils/Util.js';
@@ -24,7 +24,7 @@ export class Event {
             required: true,
             type: ApplicationCommandOptionType.Channel,
         })
-            channel: TextChannel,
+            channel: ForumChannel,
             interaction: CommandInteraction,
     ) {
         // Check if the bot has the SendMessages permission in the specified channel
@@ -39,8 +39,8 @@ export class Event {
             });
         }
 
-        // If the channel is not a GuildText channel, return an error
-        if (channel.type !== ChannelType.GuildText) {
+        // If the channel is not a GuildForum channel, return an error
+        if (channel.type !== ChannelType.GuildForum) {
             return interaction.reply({
                 content: 'The specified channel was not a text channel.',
             });
