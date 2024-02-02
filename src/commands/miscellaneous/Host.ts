@@ -109,6 +109,8 @@ export class Host {
      */
     @ModalComponent({ id: 'hostContent' })
     async modalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+        await interaction.deferReply();
+
         const data = await KeyvInstance()
             .get(interaction.guild!.id);
 
@@ -140,7 +142,8 @@ export class Host {
 
             const errorMessage = `The provided ${invalidInputs.join(' and ')} ${invalidInputs.length > 1 ? 'are' : 'is'} invalid.\nPlease double-check and try again.`;
 
-            await interaction.reply(errorMessage);
+            await interaction.editReply(errorMessage);
+            return;
         }
 
         const startEpoch = isTimeValid;
@@ -174,9 +177,7 @@ export class Host {
                 message: { embeds: [embed] },
             });
 
-            await interaction.reply(`Thread successfully created: ${thread}`);
-        } else {
-            await interaction.reply('An error occurred.');
+            await interaction.editReply(`${interaction.member} is hosting in ${thread}, at ${startEpoch}`);
         }
     }
 }
