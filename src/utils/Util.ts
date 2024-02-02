@@ -132,17 +132,17 @@ export function isValidIMDbURL(imdbField: string): boolean {
 }
 
 /**
- * Fetches and returns details of a movie based on the provided URL.
- * @param url - The URL of the movie.
- * @returns A promise that resolves to movie details or undefined if the data is not available.
+ * Fetches and returns details of content based on the provided URL.
+ * @param url - The URL of the content.
+ * @returns A promise that resolves to content details or undefined if the data is not available.
  */
-export async function getMovieDetails(url: string) {
+export async function getContentDetails(url: string) {
     try {
-        // Attempt to fetch the movie data
+        // Attempt to fetch the content data
         const data = await getTitleDetailsByUrl(url);
 
         if (!data) {
-            console.error('Movie data is not available.');
+            console.error('Content is not available.');
             return undefined; // Return early if data is not available
         }
 
@@ -153,6 +153,6 @@ export async function getMovieDetails(url: string) {
             plot: data.plot,
         };
     } catch (error) {
-        console.error('Error fetching movie data:', error);
+        console.error('Error fetching data:', error);
     }
 }
