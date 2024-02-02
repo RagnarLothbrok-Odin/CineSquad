@@ -2,6 +2,7 @@ import type { Message } from 'discord.js';
 import { Client } from 'discordx';
 import 'colors';
 import Keyv from 'keyv';
+import { IANAZone } from 'luxon';
 
 // Initialize Keyv with SQLite storage.
 const keyv = new Keyv('sqlite://src/db/db.sqlite', { table: 'cinesquad', namespace: 'cinesquad' });
@@ -105,4 +106,26 @@ export async function deleteGuildProperty(guildId: string, property: string): Pr
 
     // Set the updated data back to Keyv
     await keyv.set(guildId, existingData);
+}
+
+/**
+ * Checks if a given string is a valid time zone.
+ * Uses Luxon library to create an IANAZone object based on the provided time zone.
+ * @param timezone - The time zone string to be validated.
+ * @returns True if the time zone is valid, false otherwise.
+ * @throws an error if Luxon fails to create an IANAZone object,
+ * indicating that the provided time zone is invalid.
+ */
+export function isValidTimeZone(timezone: string): boolean {
+    return IANAZone.isValidZone(timezone);
+}
+
+/**
+ * Validates if the provided string is a valid IMDb URL.
+ * @param imdbField The IMDb URL to validate.
+ * @returns true if the IMDb URL is valid, otherwise false.
+ */
+export function isValidIMDbURL(imdbField: string): boolean {
+    const imdbRegexPattern = /^(https?:\/\/)?(www\.|m\.)?imdb\.com\/title\/tt\d+\/?$/i;
+    return imdbRegexPattern.test(imdbField);
 }
