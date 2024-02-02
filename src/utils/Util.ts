@@ -3,6 +3,7 @@ import { Client } from 'discordx';
 import 'colors';
 import Keyv from 'keyv';
 import { IANAZone } from 'luxon';
+import { getTitleDetailsByUrl } from 'movier';
 
 // Initialize Keyv with SQLite storage.
 const keyv = new Keyv('sqlite://src/db/db.sqlite', { table: 'cinesquad', namespace: 'cinesquad' });
@@ -128,4 +129,30 @@ export function isValidTimeZone(timezone: string): boolean {
 export function isValidIMDbURL(imdbField: string): boolean {
     const imdbRegexPattern = /^(https?:\/\/)?(www\.|m\.)?imdb\.com\/title\/tt\d+\/?$/i;
     return imdbRegexPattern.test(imdbField);
+}
+
+/**
+ * Fetches and returns details of a movie based on the provided URL.
+ * @param url - The URL of the movie.
+ * @returns A promise that resolves to movie details or undefined if the data is not available.
+ */
+export async function getMovieDetails(url: string) {
+    try {
+        // Attempt to fetch the movie data
+        const data = await getTitleDetailsByUrl(url);
+
+        if (!data) {
+            console.error('Movie data is not available.');
+            return undefined; // Return early if data is not available
+        }
+
+        // Extract relevant details from the data
+        return {
+            title: data.name,
+            year: data.titleYear,
+            plot: data.plot,
+        };
+    } catch (error) {
+        console.error('Error fetching movie data:', error);
+    }
 }
