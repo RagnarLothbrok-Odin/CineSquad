@@ -14,7 +14,8 @@ export class InteractionCreate {
     async onInteraction([interaction]: ArgsOf<'interactionCreate'>, client: Client) {
         // Check if the interaction is in a guild and in a guild text channel, and is either a string select menu or a chat input command.
         if (!interaction || !interaction.guild || !interaction.channel || interaction.channel.type !== ChannelType.GuildText
-            || (!interaction.isStringSelectMenu() && !interaction.isChatInputCommand() && !interaction.isContextMenuCommand())) return;
+            || (!interaction.isModalSubmit() && !interaction.isStringSelectMenu()
+                && !interaction.isChatInputCommand() && !interaction.isContextMenuCommand())) return;
 
         try {
             await client.executeInteraction(interaction);
