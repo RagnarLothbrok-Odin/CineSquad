@@ -1,6 +1,4 @@
-import {
-    Client, Discord, ModalComponent, Slash,
-} from 'discordx';
+import { Discord, ModalComponent, Slash } from 'discordx';
 import {
     ActionRowBuilder,
     codeBlock,
@@ -15,7 +13,7 @@ import {
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
 import {
-    deleteGuildProperty, getContentDetails, isValidIMDbURL, isValidTimeZone, KeyvInstance,
+    deleteGuildProperty, getContentDetails, isValidIMDbURL, isValidTime, isValidTimeZone, KeyvInstance,
 } from '../../utils/Util.js';
 
 @Discord()
@@ -27,7 +25,7 @@ export class Host {
      * @param client - The Discord client.
      */
     @Slash({ description: 'Host content on Bigscreen' })
-    async host(interaction: CommandInteraction, client: Client) {
+    async host(interaction: CommandInteraction) {
         // Check if the hosting feature is enabled
         // Retrieve data for the current guild from Keyv
         const data = await KeyvInstance()
@@ -39,10 +37,9 @@ export class Host {
             const channel = interaction.guild?.channels.cache.get(data.hosting);
 
             // Check if the channel exists and the bot has SendMessages permission
-            if (!channel || channel.permissionsFor(channel.guild.members.me!).has([
+            if (!channel || !channel.permissionsFor(channel.guild.members.me!).has([
                 PermissionsBitField.Flags.CreatePublicThreads,
                 PermissionsBitField.Flags.ManageThreads,
-                PermissionsBitField.Flags.SendMessages,
                 PermissionsBitField.Flags.SendMessagesInThreads,
             ])) {
                 // If the channel doesn't exist or bot lacks permissions, remove 'hosting' property
@@ -70,6 +67,12 @@ export class Host {
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
+        const startField = new TextInputBuilder()
+            .setCustomId('startTime')
+            .setLabel('Start time *e.g. 7:30PM')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
+
         const roomField = new TextInputBuilder()
             .setCustomId('roomId')
             .setLabel('Enter the room invite ID')
@@ -86,11 +89,15 @@ export class Host {
         );
 
         const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+            startField,
+        );
+
+        const row4 = new ActionRowBuilder<TextInputBuilder>().addComponents(
             roomField,
         );
 
         // Adding the action rows to the modal
-        contentHostModal.addComponents(row1, row2, row3);
+        contentHostModal.addComponents(row1, row2, row3, row4);
 
         // Displaying the modal in response to the interaction
         await interaction.showModal(contentHostModal);
@@ -109,13 +116,14 @@ export class Host {
         const channel = interaction.guild?.channels.cache.get(data.hosting) as ForumChannel;
 
         // Retrieving values from text input fields
-        const [imdbField, timezone, roomId] = ['imdbField', 'timezone', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
+        const [imdbField, timezone, startTime, roomId] = ['imdbField', 'timezone', 'startTime', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
         // Validate IMDb URL and timezone
         const isIMDbURLValid = isValidIMDbURL(imdbField);
         const isTimeZoneValid = isValidTimeZone(timezone);
+        const isTimeValid = isValidTime(startTime, timezone);
 
-        if (!isIMDbURLValid || !isTimeZoneValid) {
+        if (!isIMDbURLValid || !isTimeZoneValid || !isTimeValid) {
             const invalidInputs = [];
 
             if (!isIMDbURLValid) {
@@ -126,10 +134,16 @@ export class Host {
                 invalidInputs.push('timezone');
             }
 
+            if (!isTimeValid) {
+                invalidInputs.push('start time');
+            }
+
             const errorMessage = `The provided ${invalidInputs.join(' and ')} ${invalidInputs.length > 1 ? 'are' : 'is'} invalid.\nPlease double-check and try again.`;
 
             await interaction.reply(errorMessage);
         }
+
+        const startEpoch = isTimeValid;
 
         // Data is valid, fetch details
         const details = await getContentDetails(imdbField);
@@ -142,23 +156,27 @@ export class Host {
                 iconURL: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/171_Imdb_logo_logos-1024.png',
             })
             .addFields(
-                { name: 'Votes', value: `**<:imdb:1202979511755612173> ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
+                { name: 'Votes', value: `<:imdb:1202979511755612173>** ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
                 { name: 'Genres', value: details!.genres, inline: true },
                 { name: 'Stars', value: details!.cast },
             )
             .setDescription(
-                `${codeBlock('text', `${details!.plot}`)}${roomId ? `\n\n**Invite Code: ${roomId}` : ''}`,
+                `${codeBlock('text', `${details!.plot}`)}\n**Start Time: ${startEpoch}**${roomId ? `\n\n**Invite Code: ${roomId}**\n\n` : ''}`,
             )
             .setImage(details!.image);
 
         if (channel) {
             // Attempt to create the thread
-            await channel.threads.create({
-                name: `${details!.title} (${details!.year})`,
+            const thread = await channel.threads.create({
+                name: `${details!.title} (${details!.year})${roomId ? ` - Invite Code: ${roomId}` : ''}`,
                 autoArchiveDuration: 1440,
                 reason: 'Needed a separate thread for food',
                 message: { embeds: [embed] },
             });
+
+            await interaction.reply(`Thread successfully created: ${thread}`);
+        } else {
+            await interaction.reply('An error occurred.');
         }
     }
 }
