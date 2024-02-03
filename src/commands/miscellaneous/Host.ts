@@ -177,6 +177,7 @@ export class Host {
                 { name: 'Votes', value: `<:imdb:1202979511755612173>** ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
                 { name: 'Genres', value: details!.genres, inline: true },
                 { name: 'Stars', value: details!.cast },
+                { name: 'Hosted By', value: `${interaction.member}` },
                 { name: 'Start Time', value: startEpoch, inline: true },
                 { name: 'Room Invite ID', value: `${roomId || '`Unavailable`'}`, inline: true },
             )
