@@ -126,6 +126,12 @@ export class Host {
         // Retrieving values from text input fields
         const [imdbField, timezone, startTime, roomId] = ['imdbField', 'timezone', 'startTime', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
+        // Check if only one is provided
+        if ((timezone && !startTime) || (!timezone && startTime)) {
+            await interaction.editReply('Both timezone and start time are optional, but if you modify one, you need to update both together. Please provide both or leave both unchanged.');
+            return;
+        }
+
         // Validate IMDb URL and timezone
         const imdbRegexPattern = /https?:\/\/(www\.|m\.)?imdb\.com\/title\/tt(\d+)(\/)?/;
 
@@ -171,9 +177,11 @@ export class Host {
                 { name: 'Votes', value: `<:imdb:1202979511755612173>** ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
                 { name: 'Genres', value: details!.genres, inline: true },
                 { name: 'Stars', value: details!.cast },
+                { name: 'Start Time', value: startEpoch, inline: true },
+                { name: 'Room Invite ID', value: `${roomId || '`Unavailable`'}`, inline: true },
             )
             .setDescription(
-                `${codeBlock('text', `${details!.plot}`)}\n**Start Time: ${startEpoch}**${roomId ? `\n\n**Invite Code: ${roomId}**\n\n` : ''}`,
+                `${codeBlock('text', `${details!.plot}`)}`,
             )
             .setImage(details!.image);
 
@@ -233,9 +241,49 @@ export class Host {
             await interaction.reply({ content: 'This button is reserved for the thread host.', ephemeral: true });
         }
 
+        // Creating a modal for hosting content
+        const changeDetailsModal = new ModalBuilder()
+            .setTitle('Change Details')
+            .setCustomId('changeDetails');
+
         // If the button clicked was Details
         if (button[1] === 'Details') {
-            // TODO
+            const changeTimezone = new TextInputBuilder()
+                .setCustomId('changeTimezone')
+                .setLabel('Enter your timezone *e.g. GMT*')
+                .setStyle(TextInputStyle.Short)
+                .setRequired(false);
+
+            const changeStartTime = new TextInputBuilder()
+                .setCustomId('changeStartTime')
+                .setLabel('Start time *e.g. 7:30PM')
+                .setStyle(TextInputStyle.Short)
+                .setRequired(false);
+
+            const changeInviteId = new TextInputBuilder()
+                .setCustomId('changeInviteId')
+                .setLabel('Enter the room invite ID')
+                .setStyle(TextInputStyle.Short)
+                .setRequired(false);
+
+            // Creating action rows with the respective input fields
+            const row1 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                changeTimezone,
+            );
+
+            const row2 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                changeStartTime,
+            );
+
+            const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                changeInviteId,
+            );
+
+            // Adding the action rows to the modal
+            changeDetailsModal.addComponents(row1, row2, row3);
+
+            // Displaying the modal in response to the interaction
+            await interaction.showModal(changeDetailsModal);
         }
 
         // If the button clicked was StartTime
@@ -247,5 +295,89 @@ export class Host {
                 await interaction.reply({ content: 'An error occurred. Please try again.', ephemeral: true });
             }
         }
+    }
+
+    /**
+     * Handles modal submit event
+     * @param interaction - The ModalSubmitInteraction object that represents the user's interaction with the modal.
+     */
+    @ModalComponent({ id: 'changeDetails' })
+    async changeModalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
+        await interaction.deferReply();
+
+        // Retrieving values from text input fields
+        const [changeTimezone, changeStartTime, changeInviteId] = ['changeTimezone', 'changeStartTime', 'changeInviteId'].map((id) => interaction.fields.getTextInputValue(id));
+
+        // Check if only one is provided
+        if ((changeTimezone && !changeStartTime) || (!changeTimezone && changeStartTime)) {
+            await interaction.editReply('Both timezone and start time are optional, but if you modify one, you need to update both together. Please provide both or leave both unchanged.');
+            return;
+        }
+
+        const isTimeZoneValid = isValidTimeZone(changeTimezone);
+        const isTimeValid = isValidTime(changeStartTime, changeTimezone);
+
+        if (changeTimezone || changeStartTime) {
+            if (!isTimeZoneValid || !isTimeValid) {
+                const invalidInputs = [];
+
+                if (!isTimeZoneValid) {
+                    invalidInputs.push('timezone');
+                }
+
+                if (!isTimeValid) {
+                    invalidInputs.push('start time');
+                }
+
+                const errorMessage = `The provided ${invalidInputs.join(' and ')} ${invalidInputs.length > 1 ? 'are' : 'is'} invalid.\nPlease double-check and try again.`;
+
+                await interaction.editReply(errorMessage);
+                return;
+            }
+        }
+
+        const startEpoch = isTimeValid;
+
+        // Fetch the message
+        const fetchMessage = interaction.channel?.messages.fetch(interaction.message!.id);
+
+        // Fetch the embed data
+        fetchMessage?.then(async (res) => {
+            const embed = res.embeds[0]; // Assuming the embed is the first one
+
+            // Find the desired fields
+            const startTimeField = embed.fields.find((field) => field.name === 'Start Time');
+            const roomInviteIDField = embed.fields.find((field) => field.name === 'Room Invite ID');
+
+            // Handle cases where fields are not found:
+            if (!startTimeField || !roomInviteIDField) {
+                await interaction.editReply('An error occurred. Please try again.');
+                return;
+            }
+
+            // Update the field values:
+            startTimeField.value = startEpoch || startTimeField.value;
+            roomInviteIDField.value = `\`${changeInviteId}\`` || roomInviteIDField.value;
+
+            // Create a new embed object manually:
+            const newEmbed = new EmbedBuilder()
+                .setColor(embed.color)
+                .setAuthor(embed.author)
+                .addFields(
+                    ...embed.fields.filter((field) => field !== startTimeField && field !== roomInviteIDField),
+                    startTimeField,
+                    roomInviteIDField,
+                )
+                .setDescription(embed.description)
+                .setImage(embed.image!.url);
+
+            // Edit the original message with the new embed:
+            await interaction.message?.edit({
+                embeds: [newEmbed],
+                components: res.components,
+            });
+
+            await interaction.deleteReply();
+        });
     }
 }
