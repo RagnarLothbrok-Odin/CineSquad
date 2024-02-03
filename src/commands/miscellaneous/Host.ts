@@ -15,6 +15,7 @@ import {
     PermissionsBitField,
     TextInputBuilder,
     TextInputStyle,
+    ThreadChannel,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
 import {
@@ -57,7 +58,7 @@ export class Host {
         // Creating a modal for hosting content
         const contentHostModal = new ModalBuilder()
             .setTitle('Host Content')
-            .setCustomId(`hostContent_${interaction.user.id}`);
+            .setCustomId('hostContent');
 
         // Creating text input fields for an IMDb link and timezone
         const imdbField = new TextInputBuilder()
@@ -112,11 +113,8 @@ export class Host {
      * Handles modal submit event
      * @param interaction - The ModalSubmitInteraction object that represents the user's interaction with the modal.
      */
-    @ModalComponent({ id: /^hostContent_/ })
+    @ModalComponent({ id: 'hostContent' })
     async modalSubmit(interaction: ModalSubmitInteraction): Promise<void> {
-        // Extract user ID from the customId
-        const userId = interaction.customId.split('_')[1];
-
         await interaction.deferReply();
 
         const data = await KeyvInstance()
@@ -201,11 +199,11 @@ export class Host {
 
         const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-                .setCustomId(`button_Details_${userId}`)
+                .setCustomId(`button_Details_${interaction.user.id}`)
                 .setLabel('Change Details')
                 .setStyle(ButtonStyle.Danger),
             new ButtonBuilder()
-                .setCustomId(`button_LockThread_${userId}`)
+                .setCustomId(`button_LockThread_${interaction.user.id}`)
                 .setLabel('Lock Thread')
                 .setStyle(ButtonStyle.Danger),
         );
@@ -231,18 +229,23 @@ export class Host {
         const button = interaction.customId.split('_');
 
         // Return an error if the button clicker was not the original thread owner
-        if (interaction.user.id !== button[3]) {
+        if (interaction.user.id !== button[2]) {
             await interaction.reply({ content: 'This button is reserved for the thread host.', ephemeral: true });
         }
 
         // If the button clicked was Details
-        if (button[2] === 'Details') {
+        if (button[1] === 'Details') {
             // TODO
         }
 
         // If the button clicked was StartTime
-        if (button[2] === 'LockThread') {
-            // TODO
+        if (button[1] === 'LockThread') {
+            try {
+                await interaction.reply({ content: `Thread has been successfully locked.\nThank you for hosting, ${interaction.member}` });
+                await (interaction.channel as ThreadChannel).setLocked(true);
+            } catch {
+                await interaction.reply({ content: 'An error occurred. Please try again.', ephemeral: true });
+            }
         }
     }
 }
