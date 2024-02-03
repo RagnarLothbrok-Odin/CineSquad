@@ -201,13 +201,9 @@ export class Host {
 
         const row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
             new ButtonBuilder()
-                .setCustomId(`button_StartTime_${userId}`)
-                .setLabel('Change Start Time')
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId(`button_ChangeTimezone_${userId}`)
-                .setLabel('Change Time Zone')
-                .setStyle(ButtonStyle.Primary),
+                .setCustomId(`button_Details_${userId}`)
+                .setLabel('Change Details')
+                .setStyle(ButtonStyle.Danger),
             new ButtonBuilder()
                 .setCustomId(`button_LockThread_${userId}`)
                 .setLabel('Lock Thread')
@@ -227,7 +223,7 @@ export class Host {
         }
     }
 
-    @ButtonComponent({ id: /^button_(StartTime|ChangeTimezone|LockThread)_(\d+)$/ })
+    @ButtonComponent({ id: /^button_(Details|LockThread)_(\d+)$/ })
     async buttonInteraction(interaction: ButtonInteraction) {
         const button = interaction.customId.split('_');
 
@@ -236,13 +232,8 @@ export class Host {
             await interaction.reply({ content: 'This button is reserved for the thread host.', ephemeral: true });
         }
 
-        // If the button clicked was StartTime
-        if (button[2] === 'StartTime') {
-            // TODO
-        }
-
-        // If the button clicked was StartTime
-        if (button[2] === 'ChangeTimezone') {
+        // If the button clicked was Details
+        if (button[2] === 'Details') {
             // TODO
         }
 
