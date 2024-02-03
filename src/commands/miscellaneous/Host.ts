@@ -219,6 +219,9 @@ export class Host {
                 message: { embeds: [embed], components: [row1, row2] },
             });
 
+            // Add the interaction author to the thread
+            await thread.members.add(interaction.user.id);
+
             await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
         }
     }
