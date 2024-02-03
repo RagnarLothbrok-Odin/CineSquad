@@ -220,7 +220,7 @@ export class Host {
         if (channel) {
             // Attempt to create the thread
             const thread = await channel.threads.create({
-                name: `${details!.title} (${details!.year})${roomId ? ` - Invite Code: ${roomId}` : ''}`,
+                name: `${details!.title} (${details!.year})`,
                 autoArchiveDuration: 1440,
                 reason: 'Needed a separate thread for food',
                 message: { embeds: [embed], components: [row1, row2] },
