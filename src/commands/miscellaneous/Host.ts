@@ -358,7 +358,7 @@ export class Host {
 
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
-            roomInviteIDField.value = `\`${changeInviteId}\`` || roomInviteIDField.value;
+            roomInviteIDField.value = changeInviteId || roomInviteIDField.value;
 
             // Create a new embed object manually:
             const newEmbed = new EmbedBuilder()
