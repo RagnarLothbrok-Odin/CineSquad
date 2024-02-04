@@ -79,6 +79,13 @@ export class Host {
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
+        const dateField = new TextInputBuilder()
+            .setCustomId('startDate')
+            .setLabel('Date (e.g., 05/02) or leave blank for today')
+            .setPlaceholder('Enter date (day/month) or leave blank')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(false);
+
         const roomField = new TextInputBuilder()
             .setCustomId('roomId')
             .setLabel('Enter the room invite ID')
@@ -99,11 +106,15 @@ export class Host {
         );
 
         const row4 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+            dateField,
+        );
+
+        const row5 = new ActionRowBuilder<TextInputBuilder>().addComponents(
             roomField,
         );
 
         // Adding the action rows to the modal
-        contentHostModal.addComponents(row1, row2, row3, row4);
+        contentHostModal.addComponents(row1, row2, row3, row4, row5);
 
         // Displaying the modal in response to the interaction
         await interaction.showModal(contentHostModal);
@@ -124,7 +135,7 @@ export class Host {
         const channel = interaction.guild?.channels.cache.get(data.hosting) as ForumChannel;
 
         // Retrieving values from text input fields
-        const [imdbField, timezone, startTime, roomId] = ['imdbField', 'timezone', 'startTime', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
+        const [imdbField, timezone, startTime, startDate, roomId] = ['imdbField', 'timezone', 'startTime', 'startDate', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
 
         // Check if only one is provided
         if ((timezone && !startTime) || (!timezone && startTime)) {
@@ -137,7 +148,7 @@ export class Host {
 
         const isIMDbURLValid = imdbField.match(imdbRegexPattern);
         const isTimeZoneValid = isValidTimeZone(timezone);
-        const isTimeValid = isValidTime(startTime, timezone);
+        const isTimeValid = isValidTime(startTime, timezone, startDate);
 
         if (!isIMDbURLValid || !isTimeZoneValid || !isTimeValid) {
             const invalidInputs = [];
@@ -261,6 +272,13 @@ export class Host {
                 .setStyle(TextInputStyle.Short)
                 .setRequired(false);
 
+            const changeDate = new TextInputBuilder()
+                .setCustomId('changeDate')
+                .setLabel('Date (e.g., 05/02) or leave blank for today')
+                .setPlaceholder('Enter date (day/month) or leave blank')
+                .setStyle(TextInputStyle.Short)
+                .setRequired(false);
+
             const changeInviteId = new TextInputBuilder()
                 .setCustomId('changeInviteId')
                 .setLabel('Enter the room invite ID')
@@ -277,11 +295,15 @@ export class Host {
             );
 
             const row3 = new ActionRowBuilder<TextInputBuilder>().addComponents(
+                changeDate,
+            );
+
+            const row4 = new ActionRowBuilder<TextInputBuilder>().addComponents(
                 changeInviteId,
             );
 
             // Adding the action rows to the modal
-            changeDetailsModal.addComponents(row1, row2, row3);
+            changeDetailsModal.addComponents(row1, row2, row3, row4);
 
             // Displaying the modal in response to the interaction
             await interaction.showModal(changeDetailsModal);
@@ -307,7 +329,7 @@ export class Host {
         await interaction.deferReply();
 
         // Retrieving values from text input fields
-        const [changeTimezone, changeStartTime, changeInviteId] = ['changeTimezone', 'changeStartTime', 'changeInviteId'].map((id) => interaction.fields.getTextInputValue(id));
+        const [changeTimezone, changeStartTime, changeDate, changeInviteId] = ['changeTimezone', 'changeStartTime', 'changeDate', 'changeInviteId'].map((id) => interaction.fields.getTextInputValue(id));
 
         if (!changeTimezone && !changeStartTime && !changeInviteId) return interaction.deleteReply();
 
@@ -318,7 +340,7 @@ export class Host {
         }
 
         const isTimeZoneValid = isValidTimeZone(changeTimezone);
-        const isTimeValid = isValidTime(changeStartTime, changeTimezone);
+        const isTimeValid = isValidTime(changeStartTime, changeTimezone, changeDate);
 
         if (changeTimezone || changeStartTime) {
             if (!isTimeZoneValid || !isTimeValid) {
