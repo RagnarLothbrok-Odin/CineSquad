@@ -58,6 +58,7 @@ export async function getCommandIds(client: Client): Promise<{ [name: string]: s
 
         commands.forEach((command) => {
             commandIds[command.name] = command.id;
+            console.log(command);
         });
 
         return commandIds;
@@ -125,11 +126,15 @@ export function isValidTimeZone(timezone: string): boolean {
  * Checks if the provided time is valid in the specified timezone.
  * @param time - The time to validate (e.g., "7:30PM" or "19:30PM").
  * @param timezone - The timezone to use for validation.
+ * @param date - Optional date to pass
  * @returns  true if the time is valid in the specified timezone, otherwise false.
  */
-export function isValidTime(time: string, timezone: string): string | null {
-    // Attempt to create a DateTime object with the provided time and timezone
-    const dateTime = DateTime.fromFormat(time, 'h:mma', { zone: timezone });
+export function isValidTime(time: string, timezone: string, date: string = ''): string | null {
+    // Construct the full date-time string
+    const dateTimeString = date ? `${date} ${time}` : `now ${time}`;
+
+    // Attempt to create a DateTime object with the provided date and time, and set the timezone
+    const dateTime = DateTime.fromFormat(dateTimeString, 'dd/MM h:mma', { zone: timezone });
 
     // Check if the DateTime object is valid
     return dateTime.isValid ? `<t:${Math.floor(dateTime.toMillis() / 1000)}>` : null;
