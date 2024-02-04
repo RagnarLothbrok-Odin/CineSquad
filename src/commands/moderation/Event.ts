@@ -41,7 +41,7 @@ export class Event {
         // If the channel is not a GuildForum channel, return an error
         if (channel.type !== ChannelType.GuildForum) {
             return interaction.reply({
-                content: 'The specified channel was not a text channel.',
+                content: 'The specified channel was not a thread channel.',
             });
         }
 
