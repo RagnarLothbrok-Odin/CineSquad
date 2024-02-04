@@ -356,6 +356,11 @@ export class Host {
                 return;
             }
 
+            // Message to send on completion
+            const updatedDetails = 'Details Updated:\n'
+                + `${startEpoch ? `Start Time: ~~${startTimeField.value}~~ > ${startEpoch}\n` : ''}`
+                + `${changeInviteId ? `Invite ID: ${roomInviteIDField.value === 'Unavailable' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}` : ''}`;
+
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
             roomInviteIDField.value = changeInviteId || roomInviteIDField.value;
@@ -378,7 +383,9 @@ export class Host {
                 components: res.components,
             });
 
-            await interaction.deleteReply();
+            await interaction.editReply({
+                content: updatedDetails,
+            });
         });
     }
 }
