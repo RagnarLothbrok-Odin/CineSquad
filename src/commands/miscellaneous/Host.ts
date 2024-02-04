@@ -147,6 +147,12 @@ export class Host {
             return;
         }
 
+        // Check if startDate is provided but without a startTime/timezone
+        if (startDate && (!timezone || !startTime)) {
+            await interaction.editReply('If you provide a start date, you must also provide both timezone and start time.');
+            return;
+        }
+
         // Validate IMDb URL and timezone
         const imdbRegexPattern = /https?:\/\/(www\.|m\.)?imdb\.com\/title\/tt(\d+)(\/)?/;
 
@@ -343,6 +349,12 @@ export class Host {
         // Check if only one is provided
         if ((changeTimezone && !changeStartTime) || (!changeTimezone && changeStartTime)) {
             await interaction.editReply('Both timezone and start time are optional, but if you modify one, you need to update both together. Please provide both or leave both unchanged.');
+            return;
+        }
+
+        // Check if startDate is provided but without a startTime/timezone
+        if (changeDate && (!changeTimezone || !changeStartTime)) {
+            await interaction.editReply('If you provide a start date, you must also provide both timezone and start time.');
             return;
         }
 
