@@ -309,6 +309,8 @@ export class Host {
         // Retrieving values from text input fields
         const [changeTimezone, changeStartTime, changeInviteId] = ['changeTimezone', 'changeStartTime', 'changeInviteId'].map((id) => interaction.fields.getTextInputValue(id));
 
+        if (!changeTimezone && !changeStartTime && !changeInviteId) return interaction.deleteReply();
+
         // Check if only one is provided
         if ((changeTimezone && !changeStartTime) || (!changeTimezone && changeStartTime)) {
             await interaction.editReply('Both timezone and start time are optional, but if you modify one, you need to update both together. Please provide both or leave both unchanged.');
