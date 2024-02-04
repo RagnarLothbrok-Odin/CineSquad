@@ -63,19 +63,22 @@ export class Host {
         // Creating text input fields for an IMDb link and timezone
         const imdbField = new TextInputBuilder()
             .setCustomId('imdbField')
-            .setLabel('IMDb link to the content you wish to host.')
+            .setLabel('IMDb link to the content you wish to host')
+            .setPlaceholder('https://www.imdb.com/title/tt0926084')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
         const timezoneField = new TextInputBuilder()
             .setCustomId('timezone')
-            .setLabel('Enter your timezone *e.g. GMT*')
+            .setLabel('Enter your timezone')
+            .setPlaceholder('e.g., GMT')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
         const startField = new TextInputBuilder()
             .setCustomId('startTime')
-            .setLabel('Start time *e.g. 7:30PM')
+            .setLabel('Start time')
+            .setPlaceholder('e.g., 7:30PM')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
@@ -89,6 +92,7 @@ export class Host {
         const roomField = new TextInputBuilder()
             .setCustomId('roomId')
             .setLabel('Enter the room invite ID')
+            .setPlaceholder('e.g., ABC123')
             .setStyle(TextInputStyle.Short)
             .setRequired(false);
 
@@ -262,13 +266,15 @@ export class Host {
         if (button[1] === 'Details') {
             const changeTimezone = new TextInputBuilder()
                 .setCustomId('changeTimezone')
-                .setLabel('Enter your timezone *e.g. GMT*')
+                .setLabel('Enter your timezone')
+                .setPlaceholder('e.g., GMT')
                 .setStyle(TextInputStyle.Short)
                 .setRequired(false);
 
             const changeStartTime = new TextInputBuilder()
                 .setCustomId('changeStartTime')
-                .setLabel('Start time *e.g. 7:30PM')
+                .setLabel('Start time')
+                .setPlaceholder('e.g., 7:30PM')
                 .setStyle(TextInputStyle.Short)
                 .setRequired(false);
 
@@ -282,6 +288,7 @@ export class Host {
             const changeInviteId = new TextInputBuilder()
                 .setCustomId('changeInviteId')
                 .setLabel('Enter the room invite ID')
+                .setPlaceholder('e.g., ABC123')
                 .setStyle(TextInputStyle.Short)
                 .setRequired(false);
 
