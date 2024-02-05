@@ -21,7 +21,6 @@ export class Emit {
         @SlashChoice({ name: 'guildMemberAdd', value: 'guildMemberAdd' })
         @SlashChoice({ name: 'guildMemberRemove', value: 'guildMemberRemove' })
         @SlashChoice({ name: 'guildBanAdd', value: 'guildBanAdd' })
-        @SlashChoice({ name: 'guildBanRemove', value: 'guildBanRemove' })
         @SlashOption({
             description: 'Which event should be triggered?',
             name: 'event',
