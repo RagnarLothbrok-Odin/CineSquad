@@ -3,7 +3,7 @@ import { Discord, Once } from 'discordx';
 import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
 import canvafy from 'canvafy';
 import ordinal from 'ordinal';
-import { color, deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
+import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
 
 /**
  * Discord.js GuildMemberAdd event handler.
@@ -86,7 +86,7 @@ export class GuildMemberAdd {
 
                 // Create an embed with information about the joined member
                 const embed = new EmbedBuilder()
-                    .setColor(color(member.guild.members.me!.displayHexColor))
+                    .setColor('#43B482')
                     .setThumbnail(member.user.displayAvatarURL())
                     .setAuthor({
                         name: 'Member Joined',

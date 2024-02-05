@@ -1,7 +1,7 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, Once } from 'discordx';
 import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
-import { color, deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
+import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
 
 /**
  * Discord.js GuildBanAdd event handler.
@@ -30,7 +30,7 @@ export class GuildBanAdd {
                 && channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
                 // Create an embed with information about the banned member
                 const embed = new EmbedBuilder()
-                    .setColor(color(ban.guild.members.me!.displayHexColor))
+                    .setColor('#FE4611')
                     .setAuthor({ name: 'Member Banned', iconURL: ban.user.displayAvatarURL() })
                     .setThumbnail(ban.user.displayAvatarURL())
                     .setDescription(`${ban} ${ban.user.username}${ban.user.discriminator !== '0' ? `#${ban.user.discriminator}` : ''}`)

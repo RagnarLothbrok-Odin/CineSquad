@@ -1,7 +1,7 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, Once } from 'discordx';
 import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
-import { color, deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
+import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
 
 /**
  * Discord.js GuildMemberRemove event handler.
@@ -30,7 +30,7 @@ export class GuildMemberRemove {
                 && channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
                 // Create an embed with information about the joined member
                 const embed = new EmbedBuilder()
-                    .setColor(color(member.guild.members.me!.displayHexColor))
+                    .setColor('#FE4611')
                     .setThumbnail(member.user.displayAvatarURL())
                     .setAuthor({
                         name: 'Member Left',
