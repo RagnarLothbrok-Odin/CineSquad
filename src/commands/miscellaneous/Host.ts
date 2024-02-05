@@ -66,6 +66,7 @@ export class Host {
             .setLabel('IMDb link to the content you wish to host')
             .setPlaceholder('https://www.imdb.com/title/tt0926084')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(24)
             .setRequired(true);
 
         const timezoneField = new TextInputBuilder()
@@ -73,6 +74,8 @@ export class Host {
             .setLabel('Enter your timezone')
             .setPlaceholder('e.g., GMT')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(1)
+            .setMaxLength(5)
             .setRequired(true);
 
         const startField = new TextInputBuilder()
@@ -80,6 +83,8 @@ export class Host {
             .setLabel('Start time')
             .setPlaceholder('e.g., 7:30PM')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(6)
+            .setMaxLength(7)
             .setRequired(true);
 
         const dateField = new TextInputBuilder()
@@ -87,6 +92,8 @@ export class Host {
             .setLabel('Date (e.g., 05/02) or leave blank for today')
             .setPlaceholder('Enter date (day/month) or leave blank')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(5)
+            .setMaxLength(5)
             .setRequired(false);
 
         const roomField = new TextInputBuilder()
@@ -94,6 +101,8 @@ export class Host {
             .setLabel('Enter the room invite ID')
             .setPlaceholder('e.g., ABC123')
             .setStyle(TextInputStyle.Short)
+            .setMinLength(6)
+            .setMaxLength(6)
             .setRequired(false);
 
         // Creating action rows with the respective input fields
@@ -275,6 +284,8 @@ export class Host {
                 .setLabel('Enter your timezone')
                 .setPlaceholder('e.g., GMT')
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(1)
+                .setMaxLength(5)
                 .setRequired(false);
 
             const changeStartTime = new TextInputBuilder()
@@ -282,6 +293,8 @@ export class Host {
                 .setLabel('Start time')
                 .setPlaceholder('e.g., 7:30PM')
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(6)
+                .setMaxLength(7)
                 .setRequired(false);
 
             const changeDate = new TextInputBuilder()
@@ -289,6 +302,8 @@ export class Host {
                 .setLabel('Date (e.g., 05/02) or leave blank for today')
                 .setPlaceholder('Enter date (day/month) or leave blank')
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(5)
+                .setMaxLength(5)
                 .setRequired(false);
 
             const changeInviteId = new TextInputBuilder()
@@ -296,6 +311,8 @@ export class Host {
                 .setLabel('Enter the room invite ID')
                 .setPlaceholder('e.g., ABC123')
                 .setStyle(TextInputStyle.Short)
+                .setMinLength(6)
+                .setMaxLength(6)
                 .setRequired(false);
 
             // Creating action rows with the respective input fields
