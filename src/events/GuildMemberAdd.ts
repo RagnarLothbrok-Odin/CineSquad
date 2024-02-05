@@ -87,6 +87,7 @@ export class GuildMemberAdd {
                 // Create an embed with information about the joined member
                 const embed = new EmbedBuilder()
                     .setColor(color(member.guild.members.me!.displayHexColor))
+                    .setThumbnail(member.user.displayAvatarURL())
                     .setAuthor({
                         name: 'Member Joined',
                         iconURL: `${member.user.displayAvatarURL()}`,
