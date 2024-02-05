@@ -209,7 +209,7 @@ export class Host {
                 { name: 'Stars', value: details!.cast },
                 { name: 'Hosted By', value: `${interaction.member}` },
                 { name: 'Start Time', value: startEpoch, inline: true },
-                { name: 'Room Invite ID', value: `${roomId || '`Unavailable`'}`, inline: true },
+                { name: 'Room Invite ID', value: `${roomId.toUpperCase() || '`Unavailable`'}`, inline: true },
             )
             .setDescription(
                 `${codeBlock('text', `${details!.plot}`)}`,
@@ -423,7 +423,7 @@ export class Host {
 
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
-            roomInviteIDField.value = changeInviteId || roomInviteIDField.value;
+            roomInviteIDField.value = changeInviteId ? changeInviteId.toUpperCase() : roomInviteIDField.value;
 
             // Create a new embed object manually:
             const newEmbed = new EmbedBuilder()
