@@ -34,10 +34,10 @@ export class GuildMemberRemove {
                     .setThumbnail(member.user.displayAvatarURL())
                     .setAuthor({
                         name: 'Member Left',
-                        iconURL: `${member.user.displayAvatarURL()}${member.user.discriminator !== '0' ? `#${member.user.discriminator}` : ''}`,
+                        iconURL: `${member.user.displayAvatarURL()}`,
                     })
                     .setDescription(
-                        `${member.user} - \`@${member.user.tag}\``,
+                        `${member} - \`@${member.user.tag}${member.user.discriminator !== '0' ? `#${member.user.discriminator}` : ''}\``,
                     )
                     .setFooter({ text: `ID: ${member.user.id}` })
                     .setTimestamp();

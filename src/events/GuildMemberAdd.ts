@@ -93,7 +93,7 @@ export class GuildMemberAdd {
                         iconURL: `${member.user.displayAvatarURL()}`,
                     })
                     .setDescription(
-                        `${member.user} - \`@${member.user.tag}${member.user.discriminator !== '0' ? `#${member.user.discriminator}` : ''}\``,
+                        `${member} - \`@${member.user.tag}${member.user.discriminator !== '0' ? `#${member.user.discriminator}` : ''}\``,
                     )
                     .addFields(
                         {

@@ -33,7 +33,7 @@ export class GuildBanAdd {
                     .setColor('#FE4611')
                     .setAuthor({ name: 'Member Banned', iconURL: ban.user.displayAvatarURL() })
                     .setThumbnail(ban.user.displayAvatarURL())
-                    .setDescription(`${ban} ${ban.user.username}${ban.user.discriminator !== '0' ? `#${ban.user.discriminator}` : ''}`)
+                    .setDescription(`${ban} - \`@${ban.user.tag}${ban.user.discriminator !== '0' ? `#${ban.user.discriminator}` : ''}\``)
                     .setFooter({ text: `ID: ${ban.user.id}` })
                     .setTimestamp();
 
