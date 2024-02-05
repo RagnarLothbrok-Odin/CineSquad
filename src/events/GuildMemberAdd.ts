@@ -1,6 +1,8 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, Once } from 'discordx';
-import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
+import {
+    ActivityType, ChannelType, EmbedBuilder, PermissionsBitField,
+} from 'discord.js';
 import canvafy from 'canvafy';
 import ordinal from 'ordinal';
 import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
@@ -18,6 +20,12 @@ export class GuildMemberAdd {
      */
     @Once({ event: 'guildMemberAdd' })
     async onGuildMemberAdd([member]: ArgsOf<'guildMemberAdd'>, client: Client) {
+        // Set activity
+        client.user?.setActivity({
+            type: ActivityType.Watching,
+            name: `${client.guilds.cache.reduce((a, b) => a + b.memberCount, 0).toLocaleString('en')} Users`,
+        });
+
         // Retrieve data for the current guild from Keyv
         const data = await KeyvInstance()
             .get(member.guild!.id);
