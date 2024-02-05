@@ -1,4 +1,4 @@
-import type { ColorResolvable, Message } from 'discord.js';
+import type { Message } from 'discord.js';
 import { Client } from 'discordx';
 import 'colors';
 import Keyv from 'keyv';
@@ -170,19 +170,4 @@ export async function getContentDetails(url: string) {
     } catch (error) {
         console.error('Error fetching data:', error);
     }
-}
-
-/**
- * Conditionally adjusts a color value.
- * @param input - The input color value to check and potentially adjust.
- * @param targetColor - The target color to replace, defaults to '#000000'.
- * @param replacementColor - The replacement color to use if the input matches the target color.
- * Defaults to '#A10000' (brighter red).
- * @returns The adjusted color value if the input matches the target color, otherwise the original input value.
- */
-export function color(input: string, targetColor: string = '#000000', replacementColor: string = '#A10000'): ColorResolvable {
-    if (input.toLowerCase() === targetColor.toLowerCase()) {
-        return replacementColor as ColorResolvable;
-    }
-    return input as ColorResolvable;
 }
