@@ -1,8 +1,6 @@
 import type { ArgsOf, Client } from 'discordx';
 import { Discord, Once } from 'discordx';
-import {
-    ChannelType, EmbedBuilder, GuildTextBasedChannel, PermissionsBitField,
-} from 'discord.js';
+import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
 import canvafy from 'canvafy';
 import ordinal from 'ordinal';
 import { color, deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
@@ -27,7 +25,7 @@ export class GuildMemberAdd {
         // Check if 'welcome' property exists in the data
         if (data && data.welcome) {
             // Retrieve the channel using the stored ID
-            const channel = member.guild?.channels.cache.get(data.welcome) as GuildTextBasedChannel;
+            const channel = member.guild?.channels.cache.get(data.welcome);
 
             // Check if the channel exists and the bot has SendMessages permission
             if (channel && channel.type === ChannelType.GuildText
@@ -77,12 +75,16 @@ export class GuildMemberAdd {
 
         // If logging is enabled, send to channel
         if (data && data.eventLogging) {
+            // Fetch the logging channel
             const channel = await client.channels.fetch(data.eventLogging);
 
+            // Check if the channel exists, is a text channel, and has the necessary permissions to send messages
             if (channel && channel.type === ChannelType.GuildText
                 && channel.permissionsFor(channel.guild.members.me!).has(PermissionsBitField.Flags.SendMessages)) {
+                // If the member data is partial, fetch the complete member data
                 if (member.partial) await member.fetch();
 
+                // Create an embed with information about the joined member
                 const embed = new EmbedBuilder()
                     .setColor(color(member.guild.members.me!.displayHexColor))
                     .setAuthor({
@@ -99,6 +101,7 @@ export class GuildMemberAdd {
                     .setFooter({ text: `ID: ${member.user.id}` })
                     .setTimestamp();
 
+                // Send the embed to the logging channel
                 if (channel) channel.send({ embeds: [embed] });
             } else {
                 // If the channel doesn't exist or bot lacks SendMessages permission, remove 'welcome' property
