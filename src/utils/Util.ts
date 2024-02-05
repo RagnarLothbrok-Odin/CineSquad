@@ -130,11 +130,11 @@ export function isValidTimeZone(timezone: string): boolean {
  * @returns  true if the time is valid in the specified timezone, otherwise false.
  */
 export function isValidTime(time: string, timezone: string, date: string = ''): string | null {
-    // Construct the full date-time string
-    const dateTimeString = date ? `${date} ${time}` : `now ${time}`;
+    // Use provided date or default to today's date
+    const currentDate = date ? DateTime.fromFormat(date, 'dd/MM') : DateTime.local();
 
-    // Attempt to create a DateTime object with the provided date and time, and set the timezone
-    const dateTime = DateTime.fromFormat(dateTimeString, 'dd/MM h:mma', { zone: timezone });
+    // Combine the date and time
+    const dateTime = currentDate.set({ hour: DateTime.fromFormat(time, 'h:mma').hour, minute: DateTime.fromFormat(time, 'h:mma').minute });
 
     // Check if the DateTime object is valid
     return dateTime.isValid ? `<t:${Math.floor(dateTime.toMillis() / 1000)}>` : null;
