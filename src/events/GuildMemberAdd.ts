@@ -88,15 +88,27 @@ export class GuildMemberAdd {
                 const embed = new EmbedBuilder()
                     .setColor(color(member.guild.members.me!.displayHexColor))
                     .setAuthor({
-                        name: `${member.guild.name}`,
+                        name: 'Member Joined',
                         iconURL: `${member.user.displayAvatarURL()}`,
                     })
                     .setDescription(
-                        `**Member Joined:** ${member.user} - \`@${member.user.tag}\` - \`${member.user.id}\`\n**Account Created:** <t:${Math.round(
-                            member.user.createdTimestamp / 1000,
-                        )}> - (<t:${Math.round(member.user.createdTimestamp / 1000)}:R>)\n**Joined:** <t:${Math.round(
-                            member.joinedTimestamp! / 1000,
-                        )}> - (<t:${Math.round(member.joinedTimestamp! / 1000)}:R>)`,
+                        `${member.user} - \`@${member.user.tag}${member.user.discriminator !== '0' ? `#${member.user.discriminator}` : ''}\``,
+                    )
+                    .addFields(
+                        {
+                            name: 'Account Age',
+                            value: `<t:${Math.round(
+                                member.user.createdTimestamp / 1000,
+                            )}> - (<t:${Math.round(member.user.createdTimestamp / 1000)}:R>)`,
+                            inline: true,
+                        },
+                        {
+                            name: 'Joined',
+                            value: `<t:${Math.round(
+                                member.joinedTimestamp! / 1000,
+                            )}> - (<t:${Math.round(member.joinedTimestamp! / 1000)}:R>)`,
+                            inline: true,
+                        },
                     )
                     .setFooter({ text: `ID: ${member.user.id}` })
                     .setTimestamp();
