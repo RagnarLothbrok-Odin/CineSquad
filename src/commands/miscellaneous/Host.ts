@@ -421,9 +421,16 @@ export class Host {
             }
 
             // Message to send on completion
-            const updatedDetails = 'Details Updated:\n'
-                + `${startEpoch ? `Start Time: ~~${startTimeField.value}~~ > ${startEpoch}\n` : ''}`
-                + `${changeInviteId ? `Invite ID: ${roomInviteIDField.value === 'Unavailable' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}` : ''}`;
+            const updatedDetails: string[] = [];
+
+            // Check if startEpoch is defined and different from startTimeField.value
+            if (startEpoch && startEpoch !== startTimeField.value) updatedDetails.push(`Start Time: ~~${startTimeField.value}~~ > ${startEpoch}`);
+
+            // Check if changeInviteId is defined and different from roomInviteIDField.value
+            if (changeInviteId && changeInviteId !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === 'Unavailable' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}`);
+
+            // If no updates were made, delete the interaction's reply
+            if (!updatedDetails.length) return interaction.deleteReply();
 
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
@@ -448,7 +455,7 @@ export class Host {
             });
 
             await interaction.editReply({
-                content: updatedDetails,
+                content: `Details Updated:\n${updatedDetails.join('\n')}`,
             });
         });
     }
