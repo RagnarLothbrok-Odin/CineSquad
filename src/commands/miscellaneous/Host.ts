@@ -53,6 +53,8 @@ export class Host {
 
                 return interaction.reply('Hosting is currently disabled on this server. Please reach out to a staff member for assistance in configuring it.');
             }
+        } else {
+            return interaction.reply('Hosting is currently disabled on this server. Please reach out to a staff member for assistance in configuring it.');
         }
 
         // Creating a modal for hosting content
