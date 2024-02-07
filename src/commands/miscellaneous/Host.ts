@@ -262,6 +262,8 @@ export class Host {
             await thread.members.add(interaction.user.id);
 
             await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
+        } else {
+            await interaction.reply('I was unable to locate the hosting channel, please report this to a member of staff.');
         }
     }
 
