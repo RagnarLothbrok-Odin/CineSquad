@@ -169,6 +169,7 @@ export async function getContentDetails(url: string) {
             cast: data.casts.slice(0, 3).map((cast) => cast.name).join(', '),
             genres: capitalise(data.genres.join(', ')),
             image: data.posterImage.url,
+            runtime: data.runtime,
         };
     } catch (error) {
         console.error('Error fetching data:', error);
