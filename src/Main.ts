@@ -10,7 +10,7 @@ import 'dotenv/config';
  */
 const client = new Client({
     intents: [IntentsBitField.Flags.GuildMembers, IntentsBitField.Flags.Guilds,
-        IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent],
+        IntentsBitField.Flags.GuildMessages, IntentsBitField.Flags.MessageContent, IntentsBitField.Flags.GuildScheduledEvents],
     silent: true,
 });
 
