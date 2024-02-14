@@ -258,6 +258,35 @@ export class Host {
                 .setStyle(ButtonStyle.Danger),
         );
 
+        if (data.events) {
+            // Attempt to create the event
+            try {
+                const eventsChannel = interaction.guild?.channels.cache.get(data.events) as GuildTextBasedChannel | undefined;
+
+                if (eventsChannel) {
+                    await interaction.guild!.scheduledEvents.create({
+                        name: `${details!.title} (${details!.year})`,
+                        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+                        entityType: GuildScheduledEventEntityType.External,
+                        description: details!.plot,
+                        image: details!.image,
+                        reason: `${interaction.member} is hosting ${details!.title}`,
+                        entityMetadata: { location: 'BigScreen VR' },
+                        scheduledStartTime: isTimeValid,
+                        scheduledEndTime: new Date(isTimeValid.getTime() + details!.runtime.seconds * 1000),
+                    })
+                        .then((event) => {
+                            eventsChannel.send(event.url);
+
+                            // Add event ID to the embed for later use
+                            embed.setFooter({ text: `Event ID: ${event.id}` });
+                        });
+                }
+            } catch (err) {
+                console.error(`Error creating scheduled event: ${err}`);
+            }
+        }
+
         if (channel) {
             // Attempt to create the thread
             const thread = await channel.threads.create({
@@ -271,31 +300,6 @@ export class Host {
             await thread.members.add(interaction.user.id);
 
             await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
-
-            // Attempt to create the event
-            try {
-                const eventsChannel = interaction.guild?.channels.cache.get(data.events) as GuildTextBasedChannel | undefined;
-
-                if (eventsChannel) {
-                    await interaction.guild!.scheduledEvents.create({
-                        name: `${details!.title} (${details!.year})`,
-                        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
-                        entityType: GuildScheduledEventEntityType.External,
-                        description: details!.plot,
-                        channel: thread.id,
-                        image: details!.image,
-                        reason: `${interaction.member} is hosting ${details!.title}`,
-                        entityMetadata: { location: 'BigScreen VR' },
-                        scheduledStartTime: isTimeValid,
-                        scheduledEndTime: new Date(isTimeValid.getTime() + details!.runtime.seconds * 1000),
-                    })
-                        .then((event) => {
-                            eventsChannel.send(event.url);
-                        });
-                }
-            } catch (err) {
-                console.error(`Error creating scheduled event: ${err}`);
-            }
         } else {
             await interaction.reply('I was unable to locate the hosting channel, please report this to a member of staff.');
         }
