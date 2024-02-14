@@ -195,6 +195,12 @@ export class Host {
             return;
         }
 
+        // Check if time is in the past
+        if (isTimeValid.getTime() < new Date().getTime()) {
+            await interaction.editReply('The provided date was in the past.');
+            return;
+        }
+
         const startEpoch = `<t:${Math.floor(isTimeValid.getTime() / 1000)}>`;
 
         // Data is valid, fetch details
@@ -427,6 +433,12 @@ export class Host {
                 await interaction.editReply(errorMessage);
                 return;
             }
+        }
+
+        // Check if time is in the past
+        if (isTimeValid!.getTime() < new Date().getTime()) {
+            await interaction.editReply('The provided date was in the past.');
+            return;
         }
 
         const startEpoch = `<t:${Math.floor(isTimeValid!.getTime() / 1000)}>`;
