@@ -10,6 +10,9 @@ import {
     CommandInteraction,
     EmbedBuilder,
     ForumChannel,
+    GuildScheduledEventEntityType,
+    GuildScheduledEventPrivacyLevel,
+    GuildTextBasedChannel,
     ModalBuilder,
     ModalSubmitInteraction,
     PermissionsBitField,
@@ -147,7 +150,7 @@ export class Host {
             .get(interaction.guild!.id);
 
         // Retrieve the channel using the stored ID
-        const channel = interaction.guild?.channels.cache.get(data.hosting) as ForumChannel;
+        const channel = interaction.guild?.channels.cache.get(data.hosting) as ForumChannel | undefined;
 
         // Retrieving values from text input fields
         const [imdbField, timezone, startTime, startDate, roomId] = ['imdbField', 'timezone', 'startTime', 'startDate', 'roomId'].map((id) => interaction.fields.getTextInputValue(id));
@@ -192,7 +195,7 @@ export class Host {
             return;
         }
 
-        const startEpoch = isTimeValid;
+        const startEpoch = `<t:${Math.floor(isTimeValid.getTime() / 1000)}>`;
 
         // Data is valid, fetch details
         const details = await getContentDetails(imdbField);
@@ -262,6 +265,31 @@ export class Host {
             await thread.members.add(interaction.user.id);
 
             await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
+
+            // Attempt to create the event
+            try {
+                const eventsChannel = interaction.guild?.channels.cache.get(data.events) as GuildTextBasedChannel | undefined;
+
+                if (eventsChannel) {
+                    await interaction.guild!.scheduledEvents.create({
+                        name: `${details!.title} (${details!.year})`,
+                        privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
+                        entityType: GuildScheduledEventEntityType.External,
+                        description: details!.plot,
+                        channel: thread.id,
+                        image: details!.image,
+                        reason: `${interaction.member} is hosting ${details!.title}`,
+                        entityMetadata: { location: 'BigScreen VR' },
+                        scheduledStartTime: isTimeValid,
+                        scheduledEndTime: new Date(isTimeValid.getTime() + details!.runtime.seconds * 1000),
+                    })
+                        .then((event) => {
+                            eventsChannel.send(event.url);
+                        });
+                }
+            } catch (err) {
+                console.error(`Error creating scheduled event: ${err}`);
+            }
         } else {
             await interaction.reply('I was unable to locate the hosting channel, please report this to a member of staff.');
         }
@@ -401,7 +429,7 @@ export class Host {
             }
         }
 
-        const startEpoch = isTimeValid;
+        const startEpoch = `<t:${Math.floor(isTimeValid!.getTime() / 1000)}>`;
 
         // Fetch the message
         const fetchMessage = interaction.channel?.messages.fetch(interaction.message!.id);
