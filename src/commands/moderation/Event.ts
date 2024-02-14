@@ -7,7 +7,7 @@ import { setDb } from '../../utils/Util.js';
 
 @Discord()
 @Category('Staff')
-export class Forum {
+export class Event {
     /**
      * Allows configuration of the hosting module
      * @param channel - The channel host threads will start in

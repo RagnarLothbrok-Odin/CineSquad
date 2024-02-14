@@ -17,7 +17,7 @@ export class Forum {
         description: 'Configure the hosting module',
         defaultMemberPermissions: [PermissionsBitField.Flags.ManageMessages],
     })
-    async event(
+    async forum(
         @SlashOption({
             description: 'The channel host threads will start in',
             name: 'channel',
