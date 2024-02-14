@@ -476,6 +476,9 @@ export class Host {
             // If no updates were made, delete the interaction's reply
             if (!updatedDetails.length) return interaction.deleteReply();
 
+            // Store old value for future use
+            const oldValue = startTimeField.value;
+
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
             roomInviteIDField.value = changeInviteId ? changeInviteId.toUpperCase() : roomInviteIDField.value;
@@ -492,6 +495,8 @@ export class Host {
                 .setDescription(embed.description)
                 .setImage(embed.image!.url);
 
+            if (embed.footer) newEmbed.setFooter(embed.footer);
+
             // Edit the original message with the new embed:
             await interaction.message?.edit({
                 embeds: [newEmbed],
@@ -501,6 +506,32 @@ export class Host {
             await interaction.editReply({
                 content: `Details Updated:\n${updatedDetails.join('\n')}`,
             });
+
+            if (embed.footer) {
+                const eventId = embed.footer.text.split(': ')[1];
+
+                try {
+                    const event = await interaction.guild!.scheduledEvents.fetch(eventId);
+
+                    if (event && changeStartTime && oldValue !== startTimeField.value) {
+                        const details = await getContentDetails(embed.data.author!.url!);
+
+                        if (details) {
+                            const newStartTime = isTimeValid!;
+                            const newEndTime = new Date(newStartTime.getTime() + details!.runtime.seconds * 1000);
+
+                            try {
+                                event.setScheduledStartTime(newStartTime);
+                                event.setScheduledEndTime(newEndTime);
+                            } catch (error) {
+                                console.error(`Error updating scheduled event: ${error}`);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching scheduled event: ${error}`);
+                }
+            }
         });
     }
 }
