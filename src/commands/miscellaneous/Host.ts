@@ -295,10 +295,10 @@ export class Host {
                         name: `${details!.title} (${details!.year})`,
                         privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
                         entityType: GuildScheduledEventEntityType.External,
-                        description: `${threadUrl} Hosted by ${interaction.member}\n\n${details!.plot}`,
+                        description: `Hosted by ${interaction.member}\n${details!.plot}`,
                         image: details!.image,
                         reason: `${interaction.member} is hosting ${details!.title}`,
-                        entityMetadata: { location: 'BigScreen VR' },
+                        entityMetadata: { location: threadUrl },
                         scheduledStartTime: isTimeValid,
                         scheduledEndTime: new Date(isTimeValid.getTime() + details!.runtime.seconds * 1000),
                     })
