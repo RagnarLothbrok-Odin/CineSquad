@@ -13,6 +13,7 @@ import {
     GuildScheduledEventEntityType,
     GuildScheduledEventPrivacyLevel,
     GuildTextBasedChannel,
+    Message,
     ModalBuilder,
     ModalSubmitInteraction,
     PermissionsBitField,
@@ -258,7 +259,33 @@ export class Host {
                 .setStyle(ButtonStyle.Danger),
         );
 
+        // Assign for later use
+        let threadUrl: string = '';
+        let initialEmbed: Message<true> | null = null;
+
+        if (channel) {
+            // Attempt to create the thread
+            const thread = await channel.threads.create({
+                name: `${details!.title} (${details!.year})`,
+                autoArchiveDuration: 1440,
+                reason: `${interaction.member} is hosting ${details!.title}`,
+                message: { embeds: [embed], components: [row1, row2] },
+            });
+
+            // Add the interaction author to the thread
+            await thread.members.add(interaction.user.id);
+
+            // Assign for later use
+            threadUrl = thread.url;
+            initialEmbed = await thread.fetchStarterMessage();
+            await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
+        } else {
+            await interaction.reply('I was unable to locate the hosting channel, please report this to a member of staff.');
+        }
+
         if (data.events) {
+            if (!initialEmbed) return;
+
             // Attempt to create the event
             try {
                 const eventsChannel = interaction.guild?.channels.cache.get(data.events) as GuildTextBasedChannel | undefined;
@@ -268,40 +295,28 @@ export class Host {
                         name: `${details!.title} (${details!.year})`,
                         privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
                         entityType: GuildScheduledEventEntityType.External,
-                        description: details!.plot,
+                        description: `${threadUrl} Hosted by ${interaction.member}\n\n${details!.plot}`,
                         image: details!.image,
                         reason: `${interaction.member} is hosting ${details!.title}`,
                         entityMetadata: { location: 'BigScreen VR' },
                         scheduledStartTime: isTimeValid,
                         scheduledEndTime: new Date(isTimeValid.getTime() + details!.runtime.seconds * 1000),
                     })
-                        .then((event) => {
+                        .then(async (event) => {
                             eventsChannel.send(event.url);
 
-                            // Add event ID to the embed for later use
                             embed.setFooter({ text: `Event ID: ${event.id}` });
+
+                            // Edit the initial embed footer
+                            await initialEmbed!.edit({
+                                embeds: [embed],
+                                components: [row1, row2],
+                            });
                         });
                 }
             } catch (err) {
                 console.error(`Error creating scheduled event: ${err}`);
             }
-        }
-
-        if (channel) {
-            // Attempt to create the thread
-            const thread = await channel.threads.create({
-                name: `${details!.title} (${details!.year})`,
-                autoArchiveDuration: 1440,
-                reason: 'Needed a separate thread for food',
-                message: { embeds: [embed], components: [row1, row2] },
-            });
-
-            // Add the interaction author to the thread
-            await thread.members.add(interaction.user.id);
-
-            await interaction.editReply(`${interaction.member} is hosting ${thread}, at ${startEpoch}`);
-        } else {
-            await interaction.reply('I was unable to locate the hosting channel, please report this to a member of staff.');
         }
     }
 
