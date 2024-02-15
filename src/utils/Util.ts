@@ -170,6 +170,7 @@ export async function getContentDetails(url: string) {
             genres: capitalise(data.genres.join(', ')),
             image: data.posterImage.url,
             runtime: data.runtime,
+            url,
         };
     } catch (error) {
         console.error('Error fetching data:', error);
