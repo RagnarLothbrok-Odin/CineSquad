@@ -492,7 +492,18 @@ export class Host {
             const updatedDetails: string[] = [];
 
             // Check if startEpoch is defined and different from startTimeField.value
-            if (startEpoch && startEpoch !== startTimeField.value) updatedDetails.push(`Start Time: ~~${startTimeField.value}~~ > ${startEpoch}`);
+            if (startEpoch && startEpoch !== startTimeField.value) {
+                const startTimeEpoch = parseInt(startEpoch.match(/(\d+)/)![0], 10);
+                const currentStartTimeEpoch = parseInt(startTimeField.value.match(/(\d+)/)![0], 10);
+
+                if (!Number.isNaN(startTimeEpoch) && !Number.isNaN(currentStartTimeEpoch)) {
+                    const epochDiff = Math.abs(startTimeEpoch - currentStartTimeEpoch);
+
+                    if (epochDiff > 58) {
+                        updatedDetails.push(`Start Time: ~~${startTimeField.value}~~ > ${startEpoch}`);
+                    }
+                }
+            }
 
             // Check if changeInviteId is defined and different from roomInviteIDField.value
             if (changeInviteId && `\`${changeInviteId}\`` !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === '`Unavailable`' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}`);
