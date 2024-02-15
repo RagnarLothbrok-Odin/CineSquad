@@ -4,6 +4,7 @@ import 'colors';
 import Keyv from 'keyv';
 import { DateTime, IANAZone } from 'luxon';
 import { getTitleDetailsByUrl } from 'movier';
+import axios from 'axios';
 
 // Initialize Keyv with SQLite storage.
 const keyv = new Keyv('sqlite://src/db/db.sqlite', { table: 'cinesquad', namespace: 'cinesquad' });
@@ -171,8 +172,44 @@ export async function getContentDetails(url: string) {
             image: data.posterImage.url,
             runtime: data.runtime,
             url,
+            id: data.mainSource.sourceId,
         };
     } catch (error) {
         console.error('Error fetching data:', error);
+    }
+}
+
+/**
+ * Fetches and returns fanart for content.
+ * @param id - The IMDb ID of the content.
+ * @param type - The type of content to fetch: 'movie' or 'show'.
+ * @returns A promise that resolves to the URL of the fanart image, or undefined if the data is not available.
+ */
+export async function getFanartById(id: string, type: string): Promise<string | undefined> {
+    if (!process.env.FanartKey) return '';
+
+    try {
+        const parseType = type === 'movie' ? 'movies' : 'tv';
+
+        // Fetch the artwork
+        const response = await axios.get(`http://webservice.fanart.tv/v3/${parseType}/${id}?api_key=${process.env.FanartKey}`);
+
+        if (!response.data) {
+            console.error('Fanart data not available.');
+            return undefined; // Return early if fanart is not available
+        }
+
+        let reqImage = '';
+
+        // Determine the appropriate images based on the content type
+        const posters = type === 'movie' ? response.data.moviebackground : response.data.tvbackground;
+
+        reqImage = posters.length > 0 ? posters[0].url : '';
+
+        // Return the fanart image URL
+        return reqImage;
+    } catch (error) {
+        console.error('Error fetching fanart:', error);
+        return undefined;
     }
 }
