@@ -24,7 +24,7 @@ import {
 import { Category } from '@discordx/utilities';
 import { Duration } from 'luxon';
 import {
-    deleteGuildProperty, getContentDetails, isValidTime, isValidTimeZone, KeyvInstance,
+    deleteGuildProperty, getContentDetails, getFanartById, isValidTime, isValidTimeZone, KeyvInstance,
 } from '../../utils/Util.js';
 
 @Discord()
@@ -300,12 +300,15 @@ export class Host {
                 const eventsChannel = interaction.guild?.channels.cache.get(data.events) as GuildTextBasedChannel | undefined;
 
                 if (eventsChannel) {
+                    // Attempt to fetch fanart, fallback to IMDb poster
+                    const fanart = await getFanartById(details!.id, details!.type);
+
                     await interaction.guild!.scheduledEvents.create({
                         name: `${details!.title} (${details!.year})`,
                         privacyLevel: GuildScheduledEventPrivacyLevel.GuildOnly,
                         entityType: GuildScheduledEventEntityType.External,
                         description: `Hosted by ${interaction.member}\n${details!.plot}`,
-                        image: details!.image,
+                        image: fanart || details!.image,
                         reason: `${interaction.member} is hosting ${details!.title}`,
                         entityMetadata: { location: threadUrl },
                         scheduledStartTime: isTimeValid,
