@@ -22,6 +22,7 @@ import {
     ThreadChannel,
 } from 'discord.js';
 import { Category } from '@discordx/utilities';
+import { Duration } from 'luxon';
 import {
     deleteGuildProperty, getContentDetails, isValidTime, isValidTimeZone, KeyvInstance,
 } from '../../utils/Util.js';
@@ -207,6 +208,10 @@ export class Host {
         // Data is valid, fetch details
         const details = await getContentDetails(imdbField);
 
+        // Convert runtime and end time to readable format
+        const runTime = Duration.fromObject({ seconds: details!.runtime.seconds }).toFormat('h\'h\' m\'m\'');
+        const endTime = `<t:${Math.floor((isTimeValid.getTime() / 1000) + details!.runtime.seconds)}:t>`;
+
         // Embed to be sent to the created thread
         const embed = new EmbedBuilder()
             .setColor('#e0b10e')
@@ -218,10 +223,12 @@ export class Host {
             .addFields(
                 { name: 'Votes', value: `<:imdb:1202979511755612173>** ${details!.rating}/10** *(${details!.totalVotes.toLocaleString('en')} votes)*`, inline: true },
                 { name: 'Genres', value: details!.genres, inline: true },
-                { name: 'Stars', value: details!.cast },
+                { name: 'Stars', value: details!.cast, inline: true },
                 { name: 'Hosted By', value: `${interaction.member}` },
                 { name: 'Start Time', value: startEpoch, inline: true },
-                { name: 'Room Invite ID', value: `${roomId.toUpperCase() || '`Unavailable`'}`, inline: true },
+                { name: 'Runtime', value: `\`${runTime}\``, inline: true },
+                { name: 'End time', value: endTime, inline: true },
+                { name: 'Room Invite ID', value: `${roomId.toUpperCase() || '`Unavailable`'}` },
             )
             .setDescription(
                 `${codeBlock('text', `${details!.plot}`)}`,
