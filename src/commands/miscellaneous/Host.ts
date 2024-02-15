@@ -441,10 +441,13 @@ export class Host {
             return;
         }
 
-        const isTimeZoneValid = isValidTimeZone(changeTimezone);
-        const isTimeValid = isValidTime(changeStartTime, changeTimezone, changeDate);
+        let startEpoch: string = '';
+        let updatedStartTime: Date;
 
-        if (changeTimezone || changeStartTime) {
+        if (changeTimezone && changeStartTime) {
+            const isTimeZoneValid = isValidTimeZone(changeTimezone);
+            const isTimeValid = isValidTime(changeStartTime, changeTimezone, changeDate);
+
             if (!isTimeZoneValid || !isTimeValid) {
                 const invalidInputs = [];
 
@@ -461,15 +464,16 @@ export class Host {
                 await interaction.editReply(errorMessage);
                 return;
             }
-        }
 
-        // Check if time is in the past
-        if (isTimeValid!.getTime() < new Date().getTime()) {
-            await interaction.editReply('The provided date was in the past.');
-            return;
-        }
+            // Check if time is in the past
+            if (isTimeValid!.getTime() < new Date().getTime()) {
+                await interaction.editReply('The provided date was in the past.');
+                return;
+            }
 
-        const startEpoch = `<t:${Math.floor(isTimeValid!.getTime() / 1000)}>`;
+            startEpoch = `<t:${Math.floor(isTimeValid!.getTime() / 1000)}>`;
+            updatedStartTime = isTimeValid;
+        }
 
         // Fetch the message
         const fetchMessage = interaction.channel?.messages.fetch(interaction.message!.id);
@@ -492,7 +496,7 @@ export class Host {
             const updatedDetails: string[] = [];
 
             // Check if startEpoch is defined and different from startTimeField.value
-            if (startEpoch && startEpoch !== startTimeField.value) {
+            if (startEpoch.length && startEpoch !== startTimeField.value) {
                 const startTimeEpoch = parseInt(startEpoch.match(/(\d+)/)![0], 10);
                 const currentStartTimeEpoch = parseInt(startTimeField.value.match(/(\d+)/)![0], 10);
 
@@ -506,7 +510,7 @@ export class Host {
             }
 
             // Check if changeInviteId is defined and different from roomInviteIDField.value
-            if (changeInviteId && `\`${changeInviteId}\`` !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === '`Unavailable`' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}`);
+            if (changeInviteId && `\`${changeInviteId}\`` !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === '`Unavailable`' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId.toUpperCase()}\``}`);
 
             // If no updates were made, delete the interaction's reply
             if (!updatedDetails.length) return interaction.deleteReply();
@@ -516,7 +520,7 @@ export class Host {
 
             // Update the field values:
             startTimeField.value = startEpoch || startTimeField.value;
-            roomInviteIDField.value = changeInviteId ? changeInviteId.toUpperCase() : roomInviteIDField.value;
+            roomInviteIDField.value = changeInviteId ? `\`${changeInviteId.toUpperCase()}\`` : roomInviteIDField.value;
 
             // Create a new embed object manually:
             const newEmbed = new EmbedBuilder()
@@ -542,7 +546,7 @@ export class Host {
                 content: `Details Updated:\n${updatedDetails.join('\n')}`,
             });
 
-            if (embed.footer) {
+            if (embed.footer && updatedStartTime) {
                 const eventId = embed.footer.text.split(': ')[1];
 
                 try {
@@ -552,7 +556,7 @@ export class Host {
                         const details = await getContentDetails(embed.data.author!.url!);
 
                         if (details) {
-                            const newStartTime = isTimeValid!;
+                            const newStartTime = updatedStartTime!;
                             const newEndTime = new Date(newStartTime.getTime() + details!.runtime.seconds * 1000);
 
                             try {
