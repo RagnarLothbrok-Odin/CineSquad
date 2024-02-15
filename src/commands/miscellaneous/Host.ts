@@ -212,6 +212,8 @@ export class Host {
         const runTime = Duration.fromObject({ seconds: details!.runtime.seconds }).toFormat('h\'h\' m\'m\'');
         const endTime = `<t:${Math.floor((isTimeValid.getTime() / 1000) + details!.runtime.seconds)}:t>`;
 
+        const embedRoomId = roomId.toUpperCase() || 'Unavailable';
+
         // Embed to be sent to the created thread
         const embed = new EmbedBuilder()
             .setColor('#e0b10e')
@@ -228,7 +230,7 @@ export class Host {
                 { name: 'Start Time', value: startEpoch, inline: true },
                 { name: 'Runtime', value: `\`${runTime}\``, inline: true },
                 { name: 'End time', value: endTime, inline: true },
-                { name: 'Room Invite ID', value: `${roomId.toUpperCase() || '`Unavailable`'}` },
+                { name: 'Room Invite ID', value: `\`${embedRoomId}\`` },
             )
             .setDescription(
                 `${codeBlock('text', `${details!.plot}`)}`,
@@ -493,7 +495,7 @@ export class Host {
             if (startEpoch && startEpoch !== startTimeField.value) updatedDetails.push(`Start Time: ~~${startTimeField.value}~~ > ${startEpoch}`);
 
             // Check if changeInviteId is defined and different from roomInviteIDField.value
-            if (changeInviteId && changeInviteId !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === 'Unavailable' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}`);
+            if (changeInviteId && `\`${changeInviteId}\`` !== roomInviteIDField.value) updatedDetails.push(`Invite ID: ${roomInviteIDField.value === '`Unavailable`' ? `\`${changeInviteId}\`` : `~~\`${roomInviteIDField.value}\`~~ > \`${changeInviteId}\``}`);
 
             // If no updates were made, delete the interaction's reply
             if (!updatedDetails.length) return interaction.deleteReply();
