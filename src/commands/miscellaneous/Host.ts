@@ -219,7 +219,7 @@ export class Host {
             .setColor('#e0b10e')
             .setAuthor({
                 name: `${details!.title} (${details!.year})`,
-                url: imdbField,
+                url: details!.url,
                 iconURL: 'https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/171_Imdb_logo_logos-1024.png',
             })
             .addFields(
