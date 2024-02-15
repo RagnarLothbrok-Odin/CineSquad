@@ -131,7 +131,7 @@ export function isValidTimeZone(timezone: string): boolean {
  */
 export function isValidTime(time: string, timezone: string, date: string = ''): Date | null {
     // Use provided date or default to today's date
-    const currentDate = date ? DateTime.fromFormat(date, 'dd/MM') : DateTime.local();
+    const currentDate = date ? DateTime.fromFormat(date, 'dd/MM', { zone: timezone }) : DateTime.local().setZone(timezone);
 
     // Combine the date and time
     const dateTime = currentDate.set({
