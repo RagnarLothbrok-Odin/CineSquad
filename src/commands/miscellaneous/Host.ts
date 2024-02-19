@@ -563,8 +563,8 @@ export class Host {
                             const newEndTime = new Date(newStartTime.getTime() + details!.runtime.seconds * 1000);
 
                             try {
-                                event.setScheduledStartTime(newStartTime);
                                 event.setScheduledEndTime(newEndTime);
+                                event.setScheduledStartTime(newStartTime);
                             } catch (error) {
                                 console.error(`Error updating scheduled event: ${error}`);
                             }
