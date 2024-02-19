@@ -44,7 +44,7 @@ export class GuildMemberAdd {
                         extension: 'png',
                     }))
                     .setBackground('image', 'https://share.valhalladev.org/u/welcome.jpg')
-                    .setTitle(`Welcome ${member.displayName}`)
+                    .setTitle(`${member.displayName}`)
                     .setDescription(`Welcome to CineSquad!\nYou are our ${ordinal(member.guild.memberCount - member.guild.members.cache.filter((m) => m.user.bot).size)} member!`)
                     .setBorder('#2a2e35')
                     .setAvatarBorder('#B03533')
