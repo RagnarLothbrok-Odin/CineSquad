@@ -1,5 +1,6 @@
-import type { ArgsOf, Client } from 'discordx';
-import { Discord, Once } from 'discordx';
+import {
+    ArgsOf, Client, Discord, On,
+} from 'discordx';
 import {
     ActivityType, ChannelType, EmbedBuilder, PermissionsBitField,
 } from 'discord.js';
@@ -18,7 +19,7 @@ export class GuildMemberAdd {
      * @param client - The Discord client.
      * @returns void
      */
-    @Once({ event: 'guildMemberAdd' })
+    @On({ event: 'guildMemberAdd' })
     async onGuildMemberAdd([member]: ArgsOf<'guildMemberAdd'>, client: Client) {
         // Set activity
         client.user?.setActivity({
