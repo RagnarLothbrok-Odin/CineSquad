@@ -1,4 +1,4 @@
-import type { ArgsOf, Client } from 'discordx';
+import type { ArgsOf } from 'discordx';
 import { Discord, Once } from 'discordx';
 import { ChannelType, EmbedBuilder, PermissionsBitField } from 'discord.js';
 import { deleteGuildProperty, KeyvInstance } from '../utils/Util.js';
@@ -11,11 +11,10 @@ export class GuildBanAdd {
     /**
      * Executes when the GuildBanAdd event is emitted.
      * @param ban
-     * @param client - The Discord client.
      * @returns void
      */
     @Once({ event: 'guildBanAdd' })
-    async onGuildBanAdd([ban]: ArgsOf<'guildBanAdd'>, client: Client) {
+    async onGuildBanAdd([ban]: ArgsOf<'guildBanAdd'>) {
         // Retrieve data for the current guild from Keyv
         const data = await KeyvInstance()
             .get(ban.guild!.id);
@@ -23,7 +22,7 @@ export class GuildBanAdd {
         // If logging is enabled, send to channel
         if (data && data.eventLogging) {
             // Fetch the logging channel
-            const channel = await client.channels.fetch(data.eventLogging);
+            const channel = ban.guild?.channels.cache.get(data.eventLogging) ?? await ban.guild?.channels.fetch(data.eventLogging);
 
             // Check if the channel exists, is a text channel, and has the necessary permissions to send messages
             if (channel && channel.type === ChannelType.GuildText

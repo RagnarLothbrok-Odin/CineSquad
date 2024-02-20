@@ -33,7 +33,7 @@ export class GuildMemberAdd {
         // Check if 'welcome' property exists in the data
         if (data && data.welcome) {
             // Retrieve the channel using the stored ID
-            const channel = member.guild?.channels.cache.get(data.welcome);
+            const channel = member.guild?.channels.cache.get(data.welcome) ?? await member.guild?.channels.fetch(data.welcome);
 
             // Check if the channel exists and the bot has SendMessages permission
             if (channel && channel.type === ChannelType.GuildText
@@ -44,7 +44,7 @@ export class GuildMemberAdd {
                         extension: 'png',
                     }))
                     .setBackground('image', 'https://share.valhalladev.org/u/welcome.jpg')
-                    .setTitle(`${member.displayName}`)
+                    .setTitle(`${member.displayName.substring(0, 20)}`)
                     .setDescription(`Welcome to CineSquad!\nYou are our ${ordinal(member.guild.memberCount - member.guild.members.cache.filter((m) => m.user.bot).size)} member!`)
                     .setBorder('#2a2e35')
                     .setAvatarBorder('#B03533')
@@ -65,7 +65,7 @@ export class GuildMemberAdd {
 
         if (data && data.autorole) {
             // Retrieve the role using the stored ID
-            const role = member.guild.roles.cache.get(data.autorole);
+            const role = member.guild.roles.cache.get(data.autorole) ?? await member.guild?.roles.fetch(data.autorole);
 
             // Check if the role exists and the bot has ManageRoles permission
             if (role && member.guild.members.me?.permissions.has(PermissionsBitField.Flags.ManageRoles)) {
@@ -84,7 +84,7 @@ export class GuildMemberAdd {
         // If logging is enabled, send to channel
         if (data && data.eventLogging) {
             // Fetch the logging channel
-            const channel = await client.channels.fetch(data.eventLogging);
+            const channel = member.guild?.channels.cache.get(data.eventLogging) ?? await member.guild?.channels.fetch(data.eventLogging);
 
             // Check if the channel exists, is a text channel, and has the necessary permissions to send messages
             if (channel && channel.type === ChannelType.GuildText

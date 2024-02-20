@@ -31,7 +31,7 @@ export class GuildMemberRemove {
         // If logging is enabled, send to channel
         if (data && data.eventLogging) {
             // Fetch the logging channel
-            const channel = await client.channels.fetch(data.eventLogging);
+            const channel = member.guild?.channels.cache.get(data.eventLogging) ?? await member.guild?.channels.fetch(data.eventLogging);
 
             // Check if the channel exists, is a text channel, and has the necessary permissions to send messages
             if (channel && channel.type === ChannelType.GuildText
