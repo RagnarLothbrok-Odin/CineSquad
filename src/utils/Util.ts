@@ -3,7 +3,7 @@ import { Client } from 'discordx';
 import 'colors';
 import Keyv from 'keyv';
 import { DateTime, IANAZone } from 'luxon';
-import { getTitleDetailsByUrl } from 'movier';
+import { getTitleDetailsByUrl, TitleMainType } from 'movier';
 import axios from 'axios';
 
 // Initialize Keyv with SQLite storage.
@@ -159,12 +159,22 @@ export async function getContentDetails(url: string) {
             return undefined; // Return early if data is not available
         }
 
+        const contentType = {
+            [TitleMainType.Movie]: 'Movie',
+            [TitleMainType.Series]: 'Series',
+            [TitleMainType.SeriesEpisode]: 'Series Episode',
+            [TitleMainType.TVSpecial]: 'TV Special',
+            [TitleMainType.TVShort]: 'TV Short',
+            [TitleMainType.TVMovie]: 'TV Movie',
+            [TitleMainType.Video]: 'Video',
+        };
+
         // Extract relevant details from the data
         return {
             title: data.name,
             year: data.titleYear,
             plot: data.plot,
-            type: data.mainType,
+            type: contentType[data.mainType],
             rating: data.mainRate.rate,
             totalVotes: data.mainRate.votesCount,
             cast: data.casts.slice(0, 3).map((cast) => cast.name).join(', '),
