@@ -199,7 +199,7 @@ export async function getFanartById(id: string, type: string): Promise<string | 
     if (!process.env.FanartKey) return '';
 
     try {
-        const parseType = type === 'movie' ? 'movies' : 'tv';
+        const parseType = type === 'Movie' ? 'movies' : 'tv';
 
         // Fetch the artwork
         const response = await axios.get(`http://webservice.fanart.tv/v3/${parseType}/${id}?api_key=${process.env.FanartKey}`);
@@ -212,7 +212,7 @@ export async function getFanartById(id: string, type: string): Promise<string | 
         let reqImage = '';
 
         // Determine the appropriate images based on the content type
-        const posters = type === 'movie' ? response.data.moviebackground : response.data.tvbackground;
+        const posters = type === 'Movie' ? response.data.moviebackground : response.data.tvbackground;
 
         reqImage = posters.length > 0 ? posters[0].url : '';
 
